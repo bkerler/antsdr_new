@@ -1,0 +1,3768 @@
+From a5d4afa3760e08f8ea3bb840ba46484fe5243659 Mon Sep 17 00:00:00 2001
+From: Bjoern Kerler <info@revskills.de>
+Date: Tue, 19 Jul 2022 16:59:56 +0200
+Subject: [PATCH] Add sdr stuff
+
+---
+ configs/zynq_ant_defconfig                    |  73 ++++++++
+ package/Config.in                             |  36 +++-
+ package/SoapyRemote/Config.in                 |  10 +
+ package/SoapyRemote/soapyremote.mk            |  22 +++
+ package/ad9361/Config.in                      |   7 +
+ package/ad9361/ad9361.mk                      |  18 ++
+ package/charon/0001-build.patch               | 116 ++++++++++++
+ package/charon/Config.in                      |  17 ++
+ package/charon/charon.mk                      |  17 ++
+ package/civetwebws/Config.in                  |  40 ++++
+ package/civetwebws/civetwebws.hash            |   3 +
+ package/civetwebws/civetwebws.mk              |  93 +++++++++
+ package/csdr/Config.in                        |  15 ++
+ package/csdr/csdr.mk                          |  32 ++++
+ package/dump1090-pluto/Config.in              |  11 ++
+ package/dump1090-pluto/dump1090-pluto.mk      |  30 +++
+ package/dvb2iq/Config.in                      |  28 +++
+ package/dvb2iq/dvb2iq.mk                      |  26 +++
+ ...aceholders_with_their_full_namespace.patch |  15 --
+ package/gnuradio/0005-force_neonv7.patch      |  10 +
+ package/gnuradio/gnuradio.hash                |   2 +-
+ package/gnuradio/gnuradio.mk                  |   3 +-
+ package/libdvbmod/Config.in                   |   6 +
+ package/libdvbmod/libdvdmod.mk                |  28 +++
+ package/libfec/Config.in                      |   7 +
+ package/libfec/Config.in.host                 |   6 +
+ package/libfec/libfec.mk                      |  19 ++
+ package/libosmoplutosdr/Config.in             |   6 +
+ package/libosmoplutosdr/libosmoplutosdr.mk    |   6 +
+ .../0001-fix-dirs-for-cross-compile.patch     |  54 ++++++
+ package/libtuntap/Config.in                   |   6 +
+ package/libtuntap/libtuntap.mk                |  12 ++
+ package/luaradio-basic/Config.in              |  11 ++
+ package/luaradio-basic/Makefile               | 176 ++++++++++++++++++
+ package/luaradio-basic/luaradio-basic.mk      |  43 +++++
+ package/luaradio-basic/readme.patch.txt       | 165 ++++++++++++++++
+ package/multimonng/Config.in                  |   9 +
+ package/multimonng/multimonng.hash            |   1 +
+ package/multimonng/multimonng.mk              |  24 +++
+ ...e-the-build-of-pyc-files-conditional.patch |   6 +-
+ ...taddrinfo-configure-test-when-cross-.patch |   2 +-
+ ...re-to-disable-the-build-of-certain-e.patch |  16 +-
+ ...y-header-paths-for-cross-compilation.patch |  52 +++---
+ ...ook-in-usr-lib-termcap-for-libraries.patch |   4 +-
+ .../0006-Don-t-add-multiarch-paths.patch      |   2 +-
+ .../0007-Abort-on-failed-module-build.patch   |   2 +-
+ ...dd-importlib-fix-for-PEP-3147-issue.patch} |   6 +-
+ ...locale-and-set-to-default-when-addin.patch |  39 ----
+ ...-disable-installation-of-test-module.patch | 117 ------------
+ .../0014-Add-an-option-to-disable-pydoc.patch |  99 ----------
+ ...015-Add-an-option-to-disable-lib2to3.patch | 116 ------------
+ ...option-to-disable-the-sqlite3-module.patch |  69 -------
+ ...d-an-option-to-disable-the-tk-module.patch |  73 --------
+ ...-option-to-disable-the-curses-module.patch |  60 ------
+ .../0019-Add-an-option-to-disable-expat.patch |  92 ---------
+ ...-Add-an-option-to-disable-CJK-codecs.patch |  30 ---
+ .../0021-Add-an-option-to-disable-NIS.patch   |  33 ----
+ ...Add-an-option-to-disable-unicodedata.patch |  30 ---
+ .../0023-Add-an-option-to-disable-IDLE.patch  |  89 ---------
+ ...024-Add-an-option-to-disable-decimal.patch |  66 -------
+ ...on-to-disable-the-ossaudiodev-module.patch |  30 ---
+ ...an-option-to-disable-openssl-support.patch |  30 ---
+ ...ption-to-disable-the-readline-module.patch |  30 ---
+ ...hon-config.sh-don-t-reassign-prefix.patch} |   4 +-
+ ...to-disable-zlib-bzip2-and-xz-modules.patch |  42 -----
+ ...-Fix-cross-compiling-the-uuid-module.patch |  38 ----
+ ...fix-building-on-older-distributions.patch} |   0
+ ...Add-an-option-to-disable-uuid-module.patch |  33 ----
+ ...up-CC-print-multiarch-output-for-mus.patch |  48 -----
+ ...ng-doesn-t-set-errno-when-encryptio.patch} |   0
+ ...teration-error-in-_ExecutorManagerTh.patch |  29 ---
+ package/python3/Config.in                     |   9 +-
+ package/python3/Config.in.host                |   5 +
+ package/python3/python3.hash                  |   6 +-
+ package/python3/python3.mk                    |  25 ++-
+ package/retrogram-plutosdr/Config.in          |   7 +
+ .../retrogram-plutosdr/retrogram-plutosdr.mk  |  16 ++
+ package/rtl-433/Config.in                     |  12 ++
+ package/rtl-433/rtl_433.mk                    |  18 ++
+ package/rtlsdr-airband/Config.in              |  12 ++
+ package/rtlsdr-airband/rtlsdr-airband.mk      |  19 ++
+ package/rxtools/Config.in                     |  11 ++
+ package/rxtools/rxtools.mk                    |  24 +++
+ package/sigutils/Config.in                    |  13 ++
+ package/sigutils/sigutils.mk                  |  24 +++
+ package/soapysdr/Config.in                    |   7 +
+ package/soapysdr/soapysdr.mk                  |  28 +++
+ package/suscan/Config.in                      |  10 +
+ package/suscan/suscan.mk                      |  24 +++
+ package/tx-tools/Config.in                    |  10 +
+ package/tx-tools/tx_tools.mk                  |  16 ++
+ 91 files changed, 1510 insertions(+), 1276 deletions(-)
+ create mode 100755 package/SoapyRemote/Config.in
+ create mode 100755 package/SoapyRemote/soapyremote.mk
+ create mode 100755 package/ad9361/Config.in
+ create mode 100755 package/ad9361/ad9361.mk
+ create mode 100755 package/charon/0001-build.patch
+ create mode 100755 package/charon/Config.in
+ create mode 100755 package/charon/charon.mk
+ create mode 100755 package/civetwebws/Config.in
+ create mode 100755 package/civetwebws/civetwebws.hash
+ create mode 100755 package/civetwebws/civetwebws.mk
+ create mode 100755 package/csdr/Config.in
+ create mode 100755 package/csdr/csdr.mk
+ create mode 100755 package/dump1090-pluto/Config.in
+ create mode 100755 package/dump1090-pluto/dump1090-pluto.mk
+ create mode 100644 package/dvb2iq/Config.in
+ create mode 100644 package/dvb2iq/dvb2iq.mk
+ create mode 100644 package/gnuradio/0005-force_neonv7.patch
+ create mode 100644 package/libdvbmod/Config.in
+ create mode 100644 package/libdvbmod/libdvdmod.mk
+ create mode 100755 package/libfec/Config.in
+ create mode 100755 package/libfec/Config.in.host
+ create mode 100755 package/libfec/libfec.mk
+ create mode 100755 package/libosmoplutosdr/Config.in
+ create mode 100755 package/libosmoplutosdr/libosmoplutosdr.mk
+ create mode 100755 package/libtuntap/0001-fix-dirs-for-cross-compile.patch
+ create mode 100755 package/libtuntap/Config.in
+ create mode 100755 package/libtuntap/libtuntap.mk
+ create mode 100755 package/luaradio-basic/Config.in
+ create mode 100755 package/luaradio-basic/Makefile
+ create mode 100755 package/luaradio-basic/luaradio-basic.mk
+ create mode 100755 package/luaradio-basic/readme.patch.txt
+ create mode 100755 package/multimonng/Config.in
+ create mode 100755 package/multimonng/multimonng.hash
+ create mode 100755 package/multimonng/multimonng.mk
+ rename package/python3/{0012-Add-importlib-fix-for-PEP-3147-issue.patch => 0011-Add-importlib-fix-for-PEP-3147-issue.patch} (95%)
+ mode change 100644 => 100755
+ delete mode 100644 package/python3/0011-Override-system-locale-and-set-to-default-when-addin.patch
+ delete mode 100644 package/python3/0013-Add-an-option-to-disable-installation-of-test-module.patch
+ delete mode 100644 package/python3/0014-Add-an-option-to-disable-pydoc.patch
+ delete mode 100644 package/python3/0015-Add-an-option-to-disable-lib2to3.patch
+ delete mode 100644 package/python3/0016-Add-option-to-disable-the-sqlite3-module.patch
+ delete mode 100644 package/python3/0017-Add-an-option-to-disable-the-tk-module.patch
+ delete mode 100644 package/python3/0018-Add-an-option-to-disable-the-curses-module.patch
+ delete mode 100644 package/python3/0019-Add-an-option-to-disable-expat.patch
+ delete mode 100644 package/python3/0020-Add-an-option-to-disable-CJK-codecs.patch
+ delete mode 100644 package/python3/0021-Add-an-option-to-disable-NIS.patch
+ delete mode 100644 package/python3/0022-Add-an-option-to-disable-unicodedata.patch
+ delete mode 100644 package/python3/0023-Add-an-option-to-disable-IDLE.patch
+ delete mode 100644 package/python3/0024-Add-an-option-to-disable-decimal.patch
+ delete mode 100644 package/python3/0025-Add-an-option-to-disable-the-ossaudiodev-module.patch
+ delete mode 100644 package/python3/0026-Add-an-option-to-disable-openssl-support.patch
+ delete mode 100644 package/python3/0027-Add-an-option-to-disable-the-readline-module.patch
+ rename package/python3/{0029-python-config.sh-don-t-reassign-prefix.patch => 0027-python-config.sh-don-t-reassign-prefix.patch} (97%)
+ mode change 100644 => 100755
+ delete mode 100644 package/python3/0028-Add-options-to-disable-zlib-bzip2-and-xz-modules.patch
+ delete mode 100644 package/python3/0030-Fix-cross-compiling-the-uuid-module.patch
+ rename package/python3/{0032-fix-building-on-older-distributions.patch => 0030-fix-building-on-older-distributions.patch} (100%)
+ mode change 100644 => 100755
+ delete mode 100644 package/python3/0031-Add-an-option-to-disable-uuid-module.patch
+ delete mode 100644 package/python3/0033-configure.ac-fixup-CC-print-multiarch-output-for-mus.patch
+ rename package/python3/{0034-lib-crypt-uClibc-ng-doesn-t-set-errno-when-encryptio.patch => 0033-lib-crypt-uClibc-ng-doesn-t-set-errno-when-encryptio.patch} (100%)
+ mode change 100644 => 100755
+ delete mode 100644 package/python3/0036-Fix-dictionary-iteration-error-in-_ExecutorManagerTh.patch
+ create mode 100755 package/retrogram-plutosdr/Config.in
+ create mode 100755 package/retrogram-plutosdr/retrogram-plutosdr.mk
+ create mode 100755 package/rtl-433/Config.in
+ create mode 100755 package/rtl-433/rtl_433.mk
+ create mode 100755 package/rtlsdr-airband/Config.in
+ create mode 100755 package/rtlsdr-airband/rtlsdr-airband.mk
+ create mode 100644 package/rxtools/Config.in
+ create mode 100644 package/rxtools/rxtools.mk
+ create mode 100755 package/sigutils/Config.in
+ create mode 100755 package/sigutils/sigutils.mk
+ create mode 100755 package/soapysdr/Config.in
+ create mode 100755 package/soapysdr/soapysdr.mk
+ create mode 100755 package/suscan/Config.in
+ create mode 100755 package/suscan/suscan.mk
+ create mode 100755 package/tx-tools/Config.in
+ create mode 100755 package/tx-tools/tx_tools.mk
+
+diff --git a/configs/zynq_ant_defconfig b/configs/zynq_ant_defconfig
+index f1b365cbb0..2ec8361371 100644
+--- a/configs/zynq_ant_defconfig
++++ b/configs/zynq_ant_defconfig
+@@ -57,9 +57,82 @@ BR2_PACKAGE_WPA_SUPPLICANT_CLI=y
+ BR2_PACKAGE_WPA_SUPPLICANT_PASSPHRASE=y
+ BR2_PACKAGE_POLL_SYSFS=y
+ BR2_PACKAGE_AD936X_REF_CAL=y
++BR2_PACKAGE_AD9361=y
+ BR2_TARGET_ROOTFS_CPIO=y
+ BR2_TARGET_ROOTFS_CPIO_GZIP=y
+ BR2_TARGET_ROOTFS_CPIO_UIMAGE=y
+ BR2_PACKAGE_HOST_DOSFSTOOLS=y
+ BR2_PACKAGE_HOST_GENIMAGE=y
+ BR2_PACKAGE_HOST_MTOOLS=y
++BR2_PACKAGE_SOAPYSDR=y
++BR2_PACKAGE_SOAPYREMOTE=y
++BR2_PACKAGE_RETROGRAM=y
++BR2_PACKAGE_GNURADIO=y
++BR2_PACKAGE_GNURADIO_AUDIO=y
++BR2_PACKAGE_GNURADIO_BLOCKS=y
++BR2_PACKAGE_GNURADIO_CTRLPORT=y
++BR2_PACKAGE_GNURADIO_DTV=y
++BR2_PACKAGE_GNURADIO_FEC=y
++BR2_PACKAGE_GNURADIO_ZEROMQ=y
++BR2_PACKAGE_GNURADIO_ANALOG=y
++BR2_PACKAGE_GNURADIO_CHANNELS=y
++BR2_PACKAGE_GNURADIO_DIGITAL=y
++BR2_PACKAGE_GNURADIO_FFT=y
++BR2_PACKAGE_GNURADIO_FILTER=y
++BR2_PACKAGE_GNURADIO_TRELLIS=y
++#BR2_PACKAGE_GNURADIO_UHD=y
++BR2_PACKAGE_GR_OSMOSDR=y
++BR2_PACKAGE_GR_OSMOSDR_IQFILE=y
++BR2_PACKAGE_GR_OSMOSDR_RTLSDR=y
++BR2_PACKAGE_GR_OSMOSDR_RTLSDR_TCP=y
++# BR2_PACKAGE_GR_OSMOSDR_RFSPACE is not set
++BR2_PACKAGE_DUMP1090_PLUTO=y
++#BR2_PACKAGE_UHD=y
++#BR2_PACKAGE_UHD_B100=y
++#BR2_PACKAGE_UHD_B200=y
++#BR2_PACKAGE_UHD_E300=y
++#BR2_PACKAGE_UHD_E320=y
++# BR2_PACKAGE_UHD_EXAMPLES is not set
++#BR2_PACKAGE_UHD_MPMD=y
++# BR2_PACKAGE_UHD_N230 is not set
++# BR2_PACKAGE_UHD_N300 is not set
++# BR2_PACKAGE_UHD_N320 is not set
++#BR2_PACKAGE_UHD_OCTOCLOCK=y
++#BR2_PACKAGE_UHD_RFNOC=y
++#BR2_PACKAGE_UHD_USB=y
++#BR2_PACKAGE_UHD_X300=y
++BR2_PACKAGE_LAME=y
++BR2_PACKAGE_LIBCONFIG=y
++BR2_PACKAGE_LIBSHOUT=y
++BR2_PACKAGE_LIBOGG=y  
++BR2_PACKAGE_LIBVORBIS=y
++BR2_PACKAGE_HOST_PKGCONF=y 
++BR2_PACKAGE_OPENSSL=y
++BR2_PACKAGE_LIBOPENSSL=y
++BR2_PACKAGE_LIBOPENSSL_BIN=y
++BR2_PACKAGE_LIBOPENSSL_ENGINES=y
++BR2_PACKAGE_LIBSNDFILE=y
++
++BR2_PACKAGE_SUSCAN=y
++BR2_PACKAGE_TX-TOOLS=y
++BR2_PACKAGE_RXTOOLS=y
++BR2_PACKAGE_RTLSDR_AIRBAND=y
++BR2_PACKAGE_RTL_433=y
++BR2_PACKAGE_MULTIMONNG=y
++BR2_PACKAGE_SIGUTILS=y
++BR2_PACKAGE_LIBFEC=y
++BR2_PACKAGE_LUARADIO_BASIC=y
++BR2_PACKAGE_LIBTUNTAP=y
++BR2_PACKAGE_LIBOSMOPLUTOSDR=y
++BR2_PACKAGE_CIVETWEBWS=y
++BR2_PACKAGE_CIVETWEBWS_SERVER=y
++BR2_PACKAGE_CIVETWEBWS_LIB=y
++BR2_PACKAGE_CIVETWEBWS_WITH_LUA=y
++BR2_PACKAGE_NANO=y
++BR2_PACKAGE_HTOP=y
++#BR2_PACKAGE_PYTHON_MAKO=y
++#BR2_PACKAGE_PYTHON_NUMPY=y
++# BR2_PACKAGE_CHARON=y
++# BR2_PACKAGE_CSDR is not set
++# BR2_PACKAGE_LIBDVBMOD is not set
++
+diff --git a/package/Config.in b/package/Config.in
+index 5e690d7a7a..259a1054d9 100644
+--- a/package/Config.in
++++ b/package/Config.in
+@@ -453,7 +453,6 @@ endmenu
+ 	source "package/dmraid/Config.in"
+ 	source "package/dt-utils/Config.in"
+ 	source "package/dtv-scan-tables/Config.in"
+-	source "package/dump1090/Config.in"
+ 	source "package/dvb-apps/Config.in"
+ 	source "package/dvbsnoop/Config.in"
+ 	source "package/edid-decode/Config.in"
+@@ -1580,7 +1579,6 @@ menu "Hardware handling"
+ 	source "package/owfs/Config.in"
+ 	source "package/pcsc-lite/Config.in"
+ 	source "package/tslib/Config.in"
+-	source "package/uhd/Config.in"
+ 	source "package/urg/Config.in"
+ endmenu
+ 
+@@ -2022,6 +2020,37 @@ menu "Mail"
+ 	source "package/sylpheed/Config.in"
+ endmenu
+ 
++menu "SDR"
++   source "package/ad9361/Config.in"
++   source "package/soapysdr/Config.in"
++   source "package/SoapyRemote/Config.in"
++   source "package/retrogram-plutosdr/Config.in"
++   source "package/gnuradio/Config.in"
++   source "package/gqrx/Config.in"
++   source "package/gr-osmosdr/Config.in"
++   source "package/dump1090/Config.in"
++   source "package/dump1090-pluto/Config.in"
++   source "package/uhd/Config.in"
++   source "package/suscan/Config.in"
++   source "package/tx-tools/Config.in"
++   source "package/rxtools/Config.in"
++   source "package/rtlsdr-airband/Config.in"
++   source "package/rtl-433/Config.in"
++   source "package/multimonng/Config.in"
++   source "package/sigutils/Config.in"
++   #source "package/dvb2iq/Config.in"
++   #source "package/libdvbmod/Config.in"
++   source "package/libfec/Config.in"
++   source "package/luaradio-basic/Config.in"
++   source "package/libtuntap/Config.in"
++   #source "package/libssp/Config.in"
++   source "package/libosmoplutosdr/Config.in"
++   #source "package/lamableu-apps/Config.in"
++   source "package/csdr/Config.in"
++   source "package/civetwebws/Config.in"
++   source "package/charon/Config.in"
++endmenu
++
+ menu "Miscellaneous"
+ 	source "package/aespipe/Config.in"
+ 	source "package/bc/Config.in"
+@@ -2031,10 +2060,7 @@ menu "Miscellaneous"
+ 	source "package/collectl/Config.in"
+ 	source "package/domoticz/Config.in"
+ 	source "package/empty/Config.in"
+-	source "package/gnuradio/Config.in"
+ 	source "package/googlefontdirectory/Config.in"
+-	source "package/gqrx/Config.in"
+-	source "package/gr-osmosdr/Config.in"
+ 	source "package/gsettings-desktop-schemas/Config.in"
+ 	source "package/haveged/Config.in"
+ 	source "package/linux-syscall-support/Config.in"
+diff --git a/package/SoapyRemote/Config.in b/package/SoapyRemote/Config.in
+new file mode 100755
+index 0000000000..6c84754d0c
+--- /dev/null
++++ b/package/SoapyRemote/Config.in
+@@ -0,0 +1,10 @@
++config BR2_PACKAGE_SOAPYREMOTE
++        bool "soapyremote"
++        select BR2_PACKAGE_SOAPYSDR
++        help
++          This is a comment that explains what soapysdr is.
++
++          https://github.com/pothosware/SoapyRemote
++
++        comment "soapyremote needs soapysdr"
++                depends on !BR2_PACKAGE_SOAPYSDR
+diff --git a/package/SoapyRemote/soapyremote.mk b/package/SoapyRemote/soapyremote.mk
+new file mode 100755
+index 0000000000..b92c70273c
+--- /dev/null
++++ b/package/SoapyRemote/soapyremote.mk
+@@ -0,0 +1,22 @@
++################################################################################
++#
++# soapyremote
++#
++################################################################################
++
++SOAPYREMOTE_VERSION = f7dca6e67491dc56e851209f3edef2fd92656421
++#SOAPYREMOTE_SOURCE = SoapyRemote.git
++SOAPYREMOTE_SITE = https://github.com/pothosware/SoapyRemote
++SOAPYREMOTE_SITE_METHOD = git
++SOAPYREMOTE_INSTALL_STAGING = YES
++SOAPYREMOTE_INSTALL_TARGET = YES
++SOAPYREMOTE_LICENSE = Boost Software License 1.0
++SOAPYREMOTE_LICENSE_FILES = LICENSE_1_0.txt
++SOAPYREMOTE_DEPENDENCIES += soapysdr
++SOAPYREMOTE_TARGET: $(SOAPYREMOTE_DEPENDENCIES) 
++
++#SOAPYREMOTE_CONF_OPTS = -DBUILD_DEMOS=ON
++#SOAPYREMOTE_DEPENDENCIES = libglib2 host-pkgconf
++
++$(eval $(cmake-package))
++
+diff --git a/package/ad9361/Config.in b/package/ad9361/Config.in
+new file mode 100755
+index 0000000000..ba421628ee
+--- /dev/null
++++ b/package/ad9361/Config.in
+@@ -0,0 +1,7 @@
++config BR2_PACKAGE_AD9361
++        bool "ad9361"
++        help
++          This is a comment that explains what ad9361 is.
++
++          https://github.com/analogdevicesinc/libad9361-iio
++
+diff --git a/package/ad9361/ad9361.mk b/package/ad9361/ad9361.mk
+new file mode 100755
+index 0000000000..243a395714
+--- /dev/null
++++ b/package/ad9361/ad9361.mk
+@@ -0,0 +1,18 @@
++################################################################################
++#
++# libad9361-iio
++#
++################################################################################
++
++AD9361_VERSION = b32005f
++AD9361_SITE = https://github.com/analogdevicesinc/libad9361-iio
++AD9361_SITE_METHOD = git
++AD9361_INSTALL_STAGING = YES
++AD9361_INSTALL_TARGET = YES
++AD9361_LICENSE = GNU LGPL v2.1
++AD9361_LICENSE_FILES = LICENSE
++AD9361_DEPENDENCIES += libiio
++AD9361_TARGET: $(AD9361_DEPENDENCIES)
++#AD9361_CONF_OPTS = -DENABLE_PYTHON3=OFF -DENABLE_PYTHON=OFF
++
++$(eval $(cmake-package))
+diff --git a/package/charon/0001-build.patch b/package/charon/0001-build.patch
+new file mode 100755
+index 0000000000..d93b41830d
+--- /dev/null
++++ b/package/charon/0001-build.patch
+@@ -0,0 +1,116 @@
++diff --git a/Makefile b/Makefile
++index c87c596..242ab65 100644
++--- a/Makefile
+++++ b/Makefile
++@@ -1,75 +1,19 @@
++-NAME ?= charon
++-SUFFIX ?= .c
++-DIRS ?= .
+++LDFLAGS += -lliquid -liio -lad9361 -lc -lm -lfftw3 -lfftw3f -lini -lusb-1.0 \
+++-lserialport -lavahi-client -lavahi-common -lxml2 -lz -ldbus-1 -lfec -ltuntap
++ 
++-ARCH=arm
++-VIVADO_SETTINGS ?= /opt/Xilinx/Vivado/2016.4/settings64.sh
++-HAVE_VIVADO= $(shell bash -c "source $(VIVADO_SETTINGS) > /dev/null 2>&1 && vivado -version > /dev/null 2>&1 && echo 1 || echo 0")
+++SRC := $(wildcard *.c)
+++OBJ := $(addprefix build/,$(SRC:.c=.o))
++ 
++-FLAGS ?= -O3 -std=c99 -I../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/usr/include/\
++-         --sysroot=../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/\
++-        -I./third_party/libtuntap/
+++bin/charon: $(OBJ)
+++	@mkdir -p $(@D)
+++	@$(CC) $(CXXFLAGS) $(CFLAGS) $^ $(LDFLAGS) -o $@
++ 
++-SYSROOT ?= ../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/
+++build/%.o: %.c
+++	@mkdir -p $(@D)
+++	@$(CC) $(CXXFLAGS) $(CFLAGS) -MMD -MP -fPIC -c $< -o $@
++ 
++-LDFLAGS ?= --sysroot=/opt/Xilinx/SDK/2016.4/gnu/arm/lin/arm-xilinx-linux-gnueabi/libc\
++-           -L ../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/\
++-           -L /opt/Xilinx/SDK/2016.4/gnu/arm/lin/arm-xilinx-linux-gnueabi/libc\
++-           -L /opt/Xilinx/SDK/2016.4/gnu/arm/lin/arm-xilinx-linux-gnueabi/libc/lib\
++-           -L /opt/Xilinx/SDK/2016.4/gnu/arm/lin/arm-xilinx-linux-gnueabi/libc/usr/lib \
++-           -L ./third_party/libfec\
++-           -L ./third_party/libtuntap\
++-           -L$(SYSROOT) -L$(SYSROOT)lib -L$(SYSROOT)usr -L$(SYSROOT)usr/lib \
++-           -lliquid -liio -lad9361 -lc -lm -lfftw3 -lfftw3f -lini -lusb-1.0 -lserialport -lavahi-client -lavahi-common -lxml2 -lz -ldbus-1 -lfec -ltuntap
++-
++-PLATFORM := $(shell uname -s)
++-
++--include Make.config
++-
++-
++-OUT_DIR := .build
++-SRC := $(foreach dir, $(DIRS), $(wildcard $(dir)/*$(SUFFIX)))
++-OBJ_ := $(SRC:$(SUFFIX)=.o)
++-OBJ := $(addprefix $(OUT_DIR)/,$(OBJ_))
++-DEPS := $(OBJ:.o=.d)
++-SHARED_SUFFIX := dll
++-STATIC_SUFFIX := lib
++-
++-ifeq "$(PLATFORM)" "Linux"
++-    SHARED_SUFFIX := so
++-    STATIC_SUFFIX := a
++-endif
++-
++-ifeq "$(LIBRARY)" "shared"
++-    OUT=lib$(NAME).$(SHARED_SUFFIX)
++-    LDFLAGS += -shared
++-else ifeq "$(LIBRARY)" "static"
++-    OUT=lib$(NAME).$(STATIC_SUFFIX)
++-else
++-    OUT=$(NAME)
++-endif
++-
++-ifeq "$(SUFFIX)" ".cpp"
++-    COMPILER := $(CXX)
++-else ifeq "$(SUFFIX)" ".c"
++-    COMPILER := $(CROSS_COMPILE)gcc
++-endif
++-
++-.SUFFIXES:
++ .PHONY: clean
++-
++-$(OUT): $(OBJ)
++-ifeq "$(LIBRARY)" "static"
++-	@$(AR) rcs $@ $^
++-else
++-	@$(COMPILER) $^ $(LDFLAGS) -o $@
++-endif
++-
++-$(OUT_DIR)/%.o: %$(SUFFIX)
++-	@mkdir -p $(dir $@)
++-	@$(COMPILER) $(CXXFLAGS) $(FLAGS) -MMD -MP -fPIC -c $< -o $@
++-
++ clean:
++-	@$(RM) -r $(OUT) $(OUT_DIR)
+++	@rm -rf build bin
++ 
++--include: $(DEPS)
+++-include: $(OBJ:.o=.d)
++diff --git a/pluto.c b/pluto.c
++index 1158564..eee917f 100644
++--- a/pluto.c
+++++ b/pluto.c
++@@ -86,7 +86,6 @@ static float complex x;        // input sample
++ static float complex y[DECIMATE_INTERPOLATE_FACTOR];     // output samples
++ static int nbytes_tx;
++ static int llen;
++-static int index=0;
++ static int tx_mod=0;
++ static int ii=0;
++ static int jj=0;
++diff --git a/tap_device.c b/tap_device.c
++index 944e699..dc2c2eb 100644
++--- a/tap_device.c
+++++ b/tap_device.c
++@@ -33,7 +33,6 @@
++ #include <string.h>
++ #include <stdlib.h>
++ #include <unistd.h>
++-#include <strings.h>
++ #include <complex.h>
++ #include "tuntap.h"
++ #include "tap_device.h"
+diff --git a/package/charon/Config.in b/package/charon/Config.in
+new file mode 100755
+index 0000000000..ec4390f62d
+--- /dev/null
++++ b/package/charon/Config.in
+@@ -0,0 +1,17 @@
++config BR2_PACKAGE_CHARON
++    bool "charon"
++    select BR2_PACKAGE_BATCTL
++    select BR2_PACKAGE_BRIDGE_UTILS
++    select BR2_PACKAGE_FFTWF
++    select BR2_PACKAGE_IPERF3
++    select BR2_PACKAGE_IPROUTE2
++    select BR2_PACKAGE_LIQUID_DSP
++    select BR2_PACKAGE_TUNCTL
++    select BR2_PACKAGE_UTIL_LINUX
++    select BR2_PACKAGE_UTIL_LINUX_SCHEDUTILS
++    select BR2_PACKAGE_LIBFEC
++    select BR2_PACKAGE_LIBTUNTAP
++    help
++      Enable your Pluto SDR to become a stand-alone OFDM transceiver with batman-adv mesh network routing capabilities
++
++      https://github.com/tvelliott/charon
+diff --git a/package/charon/charon.mk b/package/charon/charon.mk
+new file mode 100755
+index 0000000000..c35fe20ef3
+--- /dev/null
++++ b/package/charon/charon.mk
+@@ -0,0 +1,17 @@
++CHARON_VERSION := af15fb0
++CHARON_SITE := https://github.com/tvelliott/charon.git
++CHARON_SITE_METHOD := git
++CHARON_DEPENDENCIES += batctl bridge-utils iperf3 iproute2 liquid-dsp tunctl util-linux libfec libtuntap
++CHARON_INSTALL_TARGET := YES
++
++define CHARON_BUILD_CMDS
++	$(MAKE) WORKING_DIR=$(@D) CC="$(TARGET_CC)" CXX="$(TARGET_CXX)" LD="$(TARGET_LD)" -C $(@D)
++endef
++
++define CHARON_INSTALL_TARGET_CMDS
++	$(INSTALL) -D -m 0755 $(@D)/bin/* $(TARGET_DIR)/usr/bin/
++	cp -r $(@D)/changes_to_plutosdr_fw_configs_rel_to_v28/buildroot/output/target/root $(TARGET_DIR)/
++	cp -r $(@D)/changes_to_plutosdr_fw_configs_rel_to_v28/buildroot/output/target/etc/init.d/* $(TARGET_DIR)/etc/init.d/
++endef
++
++$(eval $(generic-package))
+diff --git a/package/civetwebws/Config.in b/package/civetwebws/Config.in
+new file mode 100755
+index 0000000000..037b2b4386
+--- /dev/null
++++ b/package/civetwebws/Config.in
+@@ -0,0 +1,40 @@
++config BR2_PACKAGE_CIVETWEBWS
++	bool "civetwebws"
++	depends on BR2_TOOLCHAIN_HAS_THREADS
++	depends on BR2_USE_MMU # fork()
++	select BR2_PACKAGE_CIVETWEBWS_SERVER if !BR2_PACKAGE_CIVETWEBWS_LIB
++	help
++	  Full featured embedded web server with Lua support.
++
++	  https://sourceforge.net/projects/civetweb
++
++if BR2_PACKAGE_CIVETWEBWS
++
++config BR2_PACKAGE_CIVETWEBWS_SERVER
++	bool "enable the web server application"
++	help
++	  Include the web server and its config files.
++
++config BR2_PACKAGE_CIVETWEBWS_LIB
++	bool "enable library for embedding"
++	help
++	  Enable the civetwebws library for embedding in another
++	  application.
++
++config BR2_PACKAGE_CIVETWEBWS_WITH_LUA
++	bool "enable Lua support"
++	# required by the bundled Sqlite3 and Lua code
++	depends on !BR2_STATIC_LIBS
++	help
++	  Enable Lua support in CIVETWEBWS. Note that this will use a
++	  version of Lua and Sqlite bundled within the CIVETWEBWS
++	  sources, and not the packages from Buildroot.
++
++comment "lua support needs a toolchain w/ dynamic library"
++	depends on BR2_STATIC_LIBS
++
++endif
++
++comment "civetwebws needs a toolchain w/ threads"
++	depends on BR2_USE_MMU
++	depends on !BR2_TOOLCHAIN_HAS_THREADS
+diff --git a/package/civetwebws/civetwebws.hash b/package/civetwebws/civetwebws.hash
+new file mode 100755
+index 0000000000..631dadf9ea
+--- /dev/null
++++ b/package/civetwebws/civetwebws.hash
+@@ -0,0 +1,3 @@
++# Locally calculated
++sha256  8cab1e2ad8fb3e2e81fed0b2321a5afbd7269a644c44ed4c3607e0a212c6d9e1  civetwebws-1.12.tar.gz
++sha256  291622dfbbf4fb35829726fbe97177b7227c0d4d6392b350660af73af4f86df8  LICENSE.md
+diff --git a/package/civetwebws/civetwebws.mk b/package/civetwebws/civetwebws.mk
+new file mode 100755
+index 0000000000..22af13cd78
+--- /dev/null
++++ b/package/civetwebws/civetwebws.mk
+@@ -0,0 +1,93 @@
++################################################################################
++#
++# civetwebws
++#
++################################################################################
++
++CIVETWEBWS_VERSION = 1.12
++CIVETWEBWS_SITE = $(call github,civetweb,civetweb,v$(CIVETWEBWS_VERSION))
++CIVETWEBWS_LICENSE = MIT
++CIVETWEBWS_LICENSE_FILES = LICENSE.md
++
++CIVETWEBWS_CONF_OPTS = TARGET_OS=LINUX WITH_IPV6=1 \
++	$(if $(BR2_INSTALL_LIBSTDCPP),WITH_CPP=1)
++CIVETWEBWS_COPT = -DHAVE_POSIX_FALLOCATE=0
++CIVETWEBWS_LIBS = -lpthread -lm
++CIVETWEBWS_SYSCONFDIR = /etc
++CIVETWEBWS_HTMLDIR = /var/www
++CIVETWEBWS_INSTALL_OPTS = \
++	DOCUMENT_ROOT="$(CIVETWEBWS_HTMLDIR)" \
++	CONFIG_FILE2="$(CIVETWEBWS_SYSCONFDIR)/civetweb.conf" \
++	HTMLDIR="$(TARGET_DIR)$(CIVETWEBWS_HTMLDIR)" \
++	SYSCONFDIR="$(TARGET_DIR)$(CIVETWEBWS_SYSCONFDIR)"
++
++ifeq ($(BR2_TOOLCHAIN_HAS_SYNC_4),)
++CIVETWEBWS_COPT += -DNO_ATOMICS=1
++endif
++
++ifeq ($(BR2_PACKAGE_CIVETWEBWS_WITH_LUA),y)
++CIVETWEBWS_CONF_OPTS += WITH_LUA=1
++CIVETWEBWS_LIBS += -ldl
++endif
++
++ifeq ($(BR2_PACKAGE_OPENSSL),y)
++CIVETWEBWS_COPT += -DNO_SSL_DL
++CIVETWEBWS_LIBS += `$(PKG_CONFIG_HOST_BINARY) --libs openssl`
++CIVETWEBWS_DEPENDENCIES += openssl host-pkgconf
++else
++CIVETWEBWS_COPT += -DNO_SSL
++endif
++
++ifeq ($(BR2_PACKAGE_ZLIB),y)
++CIVETWEBWS_CONF_OPTS += WITH_ZLIB=1
++CIVETWEBWS_LIBS += -lz
++CIVETWEBWS_DEPENDENCIES += zlib
++endif
++
++ifeq ($(BR2_PACKAGE_CIVETWEBWS_SERVER),y)
++CIVETWEBWS_BUILD_TARGETS += build
++CIVETWEBWS_INSTALL_TARGETS += install
++endif
++
++ifeq ($(BR2_PACKAGE_CIVETWEBWS_LIB),y)
++CIVETWEBWS_CONF_OPTS += WITH_WEBSOCKET=1
++CIVETWEBWS_INSTALL_STAGING = YES
++CIVETWEBWS_INSTALL_TARGETS += install-headers
++
++ifeq ($(BR2_STATIC_LIBS)$(BR2_STATIC_SHARED_LIBS),y)
++CIVETWEBWS_BUILD_TARGETS += lib
++CIVETWEBWS_INSTALL_TARGETS += install-lib
++endif
++
++ifeq ($(BR2_SHARED_LIBS)$(BR2_STATIC_SHARED_LIBS),y)
++CIVETWEBWS_BUILD_TARGETS += slib
++CIVETWEBWS_INSTALL_TARGETS += install-slib
++endif
++
++endif # BR2_PACKAGE_CIVETWEBWS_LIB
++
++define CIVETWEBWS_BUILD_CMDS
++	$(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D) $(CIVETWEBWS_BUILD_TARGETS) \
++		$(CIVETWEBWS_CONF_OPTS) \
++		COPT="$(CIVETWEBWS_COPT)" LIBS="$(CIVETWEBWS_LIBS)"
++endef
++
++define CIVETWEBWS_INSTALL_STAGING_CMDS
++	mkdir -p $(STAGING_DIR)/usr/include
++	$(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D) $(CIVETWEBWS_INSTALL_TARGETS) \
++		PREFIX="$(STAGING_DIR)/usr" \
++		$(CIVETWEBWS_INSTALL_OPTS) \
++		$(CIVETWEBWS_CONF_OPTS) \
++		COPT='$(CIVETWEBWS_COPT)'
++endef
++
++define CIVETWEBWS_INSTALL_TARGET_CMDS
++	mkdir -p $(TARGET_DIR)/usr/include
++	$(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D) $(CIVETWEBWS_INSTALL_TARGETS) \
++		PREFIX="$(TARGET_DIR)/usr" \
++		$(CIVETWEBWS_INSTALL_OPTS) \
++		$(CIVETWEBWS_CONF_OPTS) \
++		COPT='$(CIVETWEBWS_COPT)'
++endef
++
++$(eval $(generic-package))
+diff --git a/package/csdr/Config.in b/package/csdr/Config.in
+new file mode 100755
+index 0000000000..5cd505d25c
+--- /dev/null
++++ b/package/csdr/Config.in
+@@ -0,0 +1,15 @@
++config BR2_PACKAGE_CSDR
++	bool "csdr"
++	depends on BR2_TOOLCHAIN_HAS_THREADS
++	depends on BR2_PACKAGE_FFTW
++#	select BR2_PACKAGE_FFTW
++#	select BR2_PACKAGE_FFTW_PRECISION_SINGLE
++	help
++	 csdr is a command line tool to carry out DSP tasks for Software Defined Radio.
++
++	  https://github.com/simonyiszk/csdr
++
++comment "csdr needs a toolchain w/ threads"
++        depends on !BR2_TOOLCHAIN_HAS_THREADS
++comment "csdr needs a fftw"
++        depends on !BR2_PACKAGE_FFTW
+\ No newline at end of file
+diff --git a/package/csdr/csdr.mk b/package/csdr/csdr.mk
+new file mode 100755
+index 0000000000..6e1079cecf
+--- /dev/null
++++ b/package/csdr/csdr.mk
+@@ -0,0 +1,32 @@
++################################################################################
++#
++# csdr
++#
++################################################################################
++
++CSDR_VERSION  = 07236afacdf1fc06562072e4a3aec3330d2def92
++CSDR_SITE = https://github.com/simonyiszk/csdr.git
++CSDR_SITE_METHOD = git
++CSDR_LICENSE = BSD-3c
++CSDR_DEPENDENCIES = fftw-double
++
++ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
++CSDR_CFLAGS += -mfpu=neon -mvectorize-with-neon-quad -funsafe-math-optimizations -Wformat=0 -DNEON_OPTS
++endif
++
++
++define CSDR_BUILD_CMDS
++	$(TARGET_CC) -std=gnu99 $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(CSDR_CFLAGS) $(@D)/fft_fftw.c $(@D)/libcsdr_wrapper.c -lm -lrt -lfftw3f -DUSE_FFTW -DLIBCSDR_GPL -DUSE_IMA_ADPCM  -fpic -shared -Wl,-soname,libcsdr.so -o $(@D)/libcsdr.so
++#	$(TARGET_CC) -std=gnu99 $(@D)/csdr.c $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(CSDR_CFLAGS) -lm -lrt -lfftw-single -DUSE_FFTW -DLIBCSDR_GPL -DUSE_IMA_ADPCM -L$(@D) -lcsdr -ffast-math -fdump-tree-vect-details -o  $(@D)/csdr
++	$(TARGET_CXX)  $(@D)/nmux.cpp $(@D)/tsmpool.cpp $(CSDR_CFLAGS) -L$(@D) -lcsdr -lpthread  -o  $(@D)/nmux
++endef
++
++define CSDR_INSTALL_TARGET_CMDS
++	$(INSTALL) -D -m 755 $(@D)/libcsdr.so $(TARGET_DIR)/usr/lib/libcsdr.so
++	$(INSTALL) -D -m 755 $(@D)/csdr $(TARGET_DIR)/usr/bin
++	$(INSTALL) -D -m 755 $(@D)/nmux $(TARGET_DIR)/usr/bin
++endef
++
++
++$(eval $(generic-package))
++
+diff --git a/package/dump1090-pluto/Config.in b/package/dump1090-pluto/Config.in
+new file mode 100755
+index 0000000000..b3e36dabcf
+--- /dev/null
++++ b/package/dump1090-pluto/Config.in
+@@ -0,0 +1,11 @@
++config BR2_PACKAGE_DUMP1090_PLUTO
++	bool "dump1090-pluto"
++	depends on BR2_TOOLCHAIN_HAS_THREADS # librtlsdr
++	select BR2_PACKAGE_LIBAD9361_IIO
++	help
++	  Dump1090 is a simple Mode S decoder for SDR devices (PlutoSDR fork)
++
++	  https://github.com/PlutoSDR/dump1090
++
++comment "dump1090 needs a toolchain w/ threads"
++	depends on !BR2_TOOLCHAIN_HAS_THREADS
+diff --git a/package/dump1090-pluto/dump1090-pluto.mk b/package/dump1090-pluto/dump1090-pluto.mk
+new file mode 100755
+index 0000000000..f2c8822bde
+--- /dev/null
++++ b/package/dump1090-pluto/dump1090-pluto.mk
+@@ -0,0 +1,30 @@
++################################################################################
++#
++# dump1090-pluto
++#
++################################################################################
++DUMP1090_PLUTO_VERSION = master
++DUMP1090_PLUTO_SITE = $(call github,PlutoSDR,dump1090,$(DUMP1090_PLUTO_VERSION))
++#DUMP1090_PLUTO_SOURCE = master
++#DUMP1090_PLUTO_VERSION = 7f764ae8035d43ef5ceb3c8e3bfff8ec9dde66df
++#DUMP1090_PLUTO_SITE = https://github.com/PlutoSDR/dump1090
++#DUMP1090_PLUTO_SITE = https://codeload.github.com/PlutoSDR/dump1090/zip/refs/heads/master
++#DUMP1090_PLUTO_SITE_METHOD = git
++DUMP1090_PLUTO_LICENSE = BSD-3-Clause
++# no real license file
++DUMP1090_PLUTO_LICENSE_FILES = README.md
++DUMP1090_PLUTO_DEPENDENCIES = host-pkgconf libad9361-iio
++
++define DUMP1090_PLUTO_BUILD_CMDS
++	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) PREFIX=/usr -C $(@D)
++endef
++
++define DUMP1090_PLUTO_INSTALL_TARGET_CMDS
++	$(INSTALL) -m 0755 -D $(@D)/dump1090 $(TARGET_DIR)/usr/bin/dump1090
++#	$(INSTALL) -m 0755 -D $(@D)/view1090 $(TARGET_DIR)/usr/bin/view1090
++#	mkdir -p $(TARGET_DIR)/www/dump1090
++#	$(INSTALL) -d $(TARGET_DIR)/www/dump1090
++#	cp -r $(@D)/public_html/* $(TARGET_DIR)/www/dump1090
++endef
++
++$(eval $(generic-package))
+diff --git a/package/dvb2iq/Config.in b/package/dvb2iq/Config.in
+new file mode 100644
+index 0000000000..e5fcf493f2
+--- /dev/null
++++ b/package/dvb2iq/Config.in
+@@ -0,0 +1,28 @@
++################################################################################
++#
++# DVB2IQ
++#
++################################################################################
++
++#DVB2IQ_VERSION = 2.2.5
++DVB2IQ_SITE =  $(TOPDIR)/package/libdvbmod/DvbTsToIQ
++#DVB2IQ_SOURCE = /home/eric/plutosdr-fw/buildroot/dl/libdvbmod.tar.gz
++#DVB2IQ_INSTALL_STAGING = YES
++#DVB2IQ_AUTORECONF = YES
++DVB2IQ_SITE_METHOD = local
++
++
++define DVB2IQ_BUILD_CMDS
++    $(MAKE) CC="$(TARGET_CXX)" LD="$(TARGET_LD)" -C $(@D)
++
++
++endef
++# $(MAKE) CC="$(TARGET_CC)"
++#define LIBDVBMOD_INSTALL_TARGET_CMDS
++#    $(INSTALL) -D -m 0755 $(@D)/hello $(TARGET_DIR)/usr/bin
++#endef
++
++#$(eval $(generic-package))
++
++#$(eval $(autotools-package))
++$(eval $(generic-package))
+diff --git a/package/dvb2iq/dvb2iq.mk b/package/dvb2iq/dvb2iq.mk
+new file mode 100644
+index 0000000000..c8c8308c2b
+--- /dev/null
++++ b/package/dvb2iq/dvb2iq.mk
+@@ -0,0 +1,26 @@
++################################################################################
++#
++# DVB2IQ
++#
++################################################################################
++
++#DVB2IQ_VERSION = 2.2.5
++DVB2IQ_SITE =  ./libdvbmod/DvbTsToIQ
++#DVB2IQ_SOURCE = /home/eric/plutosdr-fw/buildroot/dl/libdvbmod.tar.gz
++#DVB2IQ_INSTALL_STAGING = YES
++#DVB2IQ_AUTORECONF = YES
++DVB2IQ_SITE_METHOD = local
++DVB2IQ_LDFLAGS += -lfftw3
++
++define DVB2IQ_BUILD_CMDS
++    $(MAKE) CC="$(TARGET_CXX)" LD="$(TARGET_LD)" -C $(@D)
++
++
++endef
++# $(MAKE) CC="$(TARGET_CC)"
++#define LIBDVBMOD_INSTALL_TARGET_CMDS
++#    $(INSTALL) -D -m 0755 $(@D)/hello $(TARGET_DIR)/usr/bin
++#endef
++
++$(eval $(generic-package))
++
+diff --git a/package/gnuradio/0002-boost_qualify_placeholders_with_their_full_namespace.patch b/package/gnuradio/0002-boost_qualify_placeholders_with_their_full_namespace.patch
+index 4f3d892125..305a3a8a9f 100644
+--- a/package/gnuradio/0002-boost_qualify_placeholders_with_their_full_namespace.patch
++++ b/package/gnuradio/0002-boost_qualify_placeholders_with_their_full_namespace.patch
+@@ -107,21 +107,6 @@ index 5914283908..fca4cab97e 100644
+  
+      configure_default_loggers(d_logger, d_debug_logger, symbol_name());
+  }
+-diff --git a/gr-analog/lib/sig_source_impl.cc b/gr-analog/lib/sig_source_impl.cc
+-index b73b32982d..01c5fbfdb0 100644
+---- a/gr-analog/lib/sig_source_impl.cc
+-+++ b/gr-analog/lib/sig_source_impl.cc
+-@@ -67,7 +67,9 @@ sig_source_impl<T>::sig_source_impl(double sampling_freq,
+-     this->set_phase(phase);
+-     this->message_port_register_in(pmt::mp("freq"));
+-     this->set_msg_handler(pmt::mp("freq"),
+--                          boost::bind(&sig_source_impl<T>::set_frequency_msg, this, _1));
+-+                          boost::bind(&sig_source_impl<T>::set_frequency_msg,
+-+                                      this,
+-+                                      boost::placeholders::_1));
+- }
+- 
+- template <class T>
+ diff --git a/gr-blocks/lib/copy_impl.cc b/gr-blocks/lib/copy_impl.cc
+ index c377e57b1e..b55196c24b 100644
+ --- a/gr-blocks/lib/copy_impl.cc
+diff --git a/package/gnuradio/0005-force_neonv7.patch b/package/gnuradio/0005-force_neonv7.patch
+new file mode 100644
+index 0000000000..342ccf6aba
+--- /dev/null
++++ b/package/gnuradio/0005-force_neonv7.patch
+@@ -0,0 +1,10 @@
++--- ./volk/lib/CMakeLists.txt	2020-08-21 20:58:10.000000000 +0200
+++++ ./volk/lib/CMakeLists.txt	2022-07-18 15:05:45.353048746 +0200
++@@ -259,6 +259,7 @@
++ 
++ include(CheckCSourceCompiles)
++ 
+++set(have_neonv7_result 1)
++ check_c_source_compiles("#include <arm_neon.h>\nint main(){ uint8_t *dest; uint8x8_t res; vst1_u8(dest, res); }"
++ 	                neon_compile_result)
++ 
+diff --git a/package/gnuradio/gnuradio.hash b/package/gnuradio/gnuradio.hash
+index 2f147761d8..e47c5faaba 100644
+--- a/package/gnuradio/gnuradio.hash
++++ b/package/gnuradio/gnuradio.hash
+@@ -1,3 +1,3 @@
+ # Locally computed
+-sha256 e15311e7da9fe2bb790cc36321d7eb2d93b9dfa0c1552fa5d534dd99d22873be  gnuradio-3.8.1.0.tar.gz
++sha256 3e293541a9ac8d78660762bae8b80c0f6195b3494e1c50c01a9fd79cc60bb624  gnuradio-3.8.2.0.tar.gz
+ sha256 8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903  COPYING
+diff --git a/package/gnuradio/gnuradio.mk b/package/gnuradio/gnuradio.mk
+index 10402da49f..58ed47af21 100644
+--- a/package/gnuradio/gnuradio.mk
++++ b/package/gnuradio/gnuradio.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GNURADIO_VERSION = 3.8.1.0
++GNURADIO_VERSION = 3.8.2.0
+ GNURADIO_SITE = https://github.com/gnuradio/gnuradio/releases/download/v$(GNURADIO_VERSION)
+ GNURADIO_LICENSE = GPL-3.0+
+ GNURADIO_LICENSE_FILES = COPYING
+@@ -167,3 +167,4 @@ GNURADIO_CONF_OPTS += -DENABLE_GR_ZEROMQ=OFF
+ endif
+ 
+ $(eval $(cmake-package))
++
+diff --git a/package/libdvbmod/Config.in b/package/libdvbmod/Config.in
+new file mode 100644
+index 0000000000..79b6cb08cf
+--- /dev/null
++++ b/package/libdvbmod/Config.in
+@@ -0,0 +1,6 @@
++config BR2_PACKAGE_LIBDVBMOD
++	bool "libdvbmod"
++	help
++	  A simple library to get I/Q symbols from a MPEG Transport stream
++
++	  https://github.com/F5OEO/libdvbmod
+diff --git a/package/libdvbmod/libdvdmod.mk b/package/libdvbmod/libdvdmod.mk
+new file mode 100644
+index 0000000000..7ca7751f80
+--- /dev/null
++++ b/package/libdvbmod/libdvdmod.mk
+@@ -0,0 +1,28 @@
++################################################################################
++#
++# LIBDVBMOD
++#
++################################################################################
++
++LIBDVBMOD_VERSION = eff68b37047196e5bc732b08fa7f73c2bf94107e
++LIBDVBMOD_SITE =  https://github.com/F5OEO/libdvbmod
++#LIBDVBMOD_SOURCE = /home/eric/plutosdr-fw/buildroot/dl/libdvbmod.tar.gz
++#LIBDVBMOD_INSTALL_STAGING = YES
++#LIBDVBMOD_AUTORECONF = YES
++LIBDVBMOD_SITE_METHOD = git
++
++
++define LIBDVBMOD_BUILD_CMDS
++    $(MAKE) $(CC)="$(TARGET_CXX)" LD="$(TARGET_LD)" -C $(@D)/libdvbmod
++    $(MAKE) $(CC)="$(TARGET_CXX)" LD="$(TARGET_LD)" -C $(@D)/DvbTsToIQ
++
++endef
++# $(MAKE) CC="$(TARGET_CC)"
++#define LIBDVBMOD_INSTALL_TARGET_CMDS
++#    $(INSTALL) -D -m 0755 $(@D)/hello $(TARGET_DIR)/usr/bin
++#endef
++
++#$(eval $(generic-package))
++
++#$(eval $(autotools-package))
++$(eval $(generic-package))
+diff --git a/package/libfec/Config.in b/package/libfec/Config.in
+new file mode 100755
+index 0000000000..8349d231d4
+--- /dev/null
++++ b/package/libfec/Config.in
+@@ -0,0 +1,7 @@
++config BR2_PACKAGE_LIBFEC
++    bool "libfec"
++    select host-libfec
++    help
++      This package provides a set of functions that implement several popular forward error correction (FEC) algorithms and several low-level routines useful in modems implemented with digital signal processing (DSP).
++
++      https://github.com/quiet/libfec
+diff --git a/package/libfec/Config.in.host b/package/libfec/Config.in.host
+new file mode 100755
+index 0000000000..ccf6dc9bf7
+--- /dev/null
++++ b/package/libfec/Config.in.host
+@@ -0,0 +1,6 @@
++config BR2_PACKAGE_HOST_LIBFEC
++    bool "host-libfec"
++    help
++      This package provides a set of functions that implement several popular forward error correction (FEC) algorithms and several low-level routines useful in modems implemented with digital signal processing (DSP).
++
++      https://github.com/quiet/libfec
+diff --git a/package/libfec/libfec.mk b/package/libfec/libfec.mk
+new file mode 100755
+index 0000000000..92cfd77e24
+--- /dev/null
++++ b/package/libfec/libfec.mk
+@@ -0,0 +1,19 @@
++LIBFEC_VERSION := 9750ca0
++LIBFEC_SITE := https://github.com/quiet/libfec
++LIBFEC_SITE_METHOD := git
++LIBFEC_DEPENDENCIES += host-libfec
++LIBFEC_INSTALL_STAGING := YES
++LIBFEC_INSTALL_TARGET := YES
++LIBFEC_LICENSE = LGPL-2.1+
++LIBFEC_LICENSE_FILES = lesser.txt
++
++define HOST_LIBFEC_INSTALL_CMDS
++	$(INSTALL) -D -m 0755 $(@D)/{gen_ccsds,gen_ccsds_tal} $(HOST_DIR)/bin/
++endef
++
++define LIBFEC_INSTALL_STAGING_CMDS
++	$(INSTALL) -D -m 0644 $(@D)/*.so* $(STAGING_DIR)/usr/lib/
++endef
++
++$(eval $(cmake-package))
++$(eval $(host-cmake-package))
+diff --git a/package/libosmoplutosdr/Config.in b/package/libosmoplutosdr/Config.in
+new file mode 100755
+index 0000000000..b7d8ec8cc8
+--- /dev/null
++++ b/package/libosmoplutosdr/Config.in
+@@ -0,0 +1,6 @@
++config BR2_PACKAGE_LIBOSMOPLUTOSDR
++        bool "libosmoplutosdr"
++        help
++          lib for the experimental plutosdr kernel module
++
++          https://github.com/Hoernchen/libosmoplutosdr
+diff --git a/package/libosmoplutosdr/libosmoplutosdr.mk b/package/libosmoplutosdr/libosmoplutosdr.mk
+new file mode 100755
+index 0000000000..cb0e118797
+--- /dev/null
++++ b/package/libosmoplutosdr/libosmoplutosdr.mk
+@@ -0,0 +1,6 @@
++LIBOSMOPLUTOSDR_VERSION := c78c8e6
++LIBOSMOPLUTOSDR_SITE := https://github.com/Hoernchen/libosmoplutosdr.git
++LIBOSMOPLUTOSDR_SITE_METHOD := git
++LIBOSMOPLUTOSDR_INSTALL_TARGET := YES
++
++$(eval $(cmake-package))
+diff --git a/package/libtuntap/0001-fix-dirs-for-cross-compile.patch b/package/libtuntap/0001-fix-dirs-for-cross-compile.patch
+new file mode 100755
+index 0000000000..fc5b6f1df0
+--- /dev/null
++++ b/package/libtuntap/0001-fix-dirs-for-cross-compile.patch
+@@ -0,0 +1,54 @@
++diff --git a/CMakeLists.txt b/CMakeLists.txt
++index 712443f..a65212a 100644
++--- a/CMakeLists.txt
+++++ b/CMakeLists.txt
++@@ -19,7 +19,6 @@ endif()
++ # -------------------
++ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
++ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
++-set(CMAKE_INSTALL_PREFIX "/usr/local/")
++ set(${CMAKE_SYSTEM_NAME} True)
++ 
++ # Global CPP definitions
++@@ -36,18 +35,10 @@ set(SOURCES_LIST
++ # OS families specific things
++ # ---------------------------
++ if(UNIX)
++-    # Unix specific include directories
++-    # ---------------------------------
++-    include_directories(
++-        "${CMAKE_CURRENT_SOURCE_DIR}"
++-        /usr/include/
++-        /usr/local/include
++-    )
++-    
++     # Unix specific definitions
++     # -------------------------
++     add_definitions(-DUnix)
++-    
+++
++     # Unix specific source files
++     # --------------------------
++     set(SOURCES_LIST ${SOURCES_LIST} tuntap-unix.c )
++@@ -57,7 +48,7 @@ if(Windows)
++     # Windows specific definitions
++     # ----------------------------
++     add_definitions(-DWindows)
++-    
+++
++     # Windows specific source files
++     # -----------------------------
++     set(SOURCES_LIST ${SOURCES_LIST} tuntap-windows.c )
++@@ -67,7 +58,6 @@ endif(Windows)
++ # ------------------
++ if(UNIX)
++     if(Linux)
++-        set(CMAKE_INSTALL_PREFIX "/usr/")
++         add_definitions(-D_GNU_SOURCE)
++         set(SOURCES_LIST ${SOURCES_LIST} tuntap-unix-linux.c)
++     elseif (OpenBSD)
++@@ -133,4 +123,3 @@ include(CMakeLists.txt.local OPTIONAL)
++ if (ENABLE_REGRESS)
++     include(regress/CMakeLists.txt)
++ endif (ENABLE_REGRESS)
++-
+diff --git a/package/libtuntap/Config.in b/package/libtuntap/Config.in
+new file mode 100755
+index 0000000000..2957386c03
+--- /dev/null
++++ b/package/libtuntap/Config.in
+@@ -0,0 +1,6 @@
++config BR2_PACKAGE_LIBTUNTAP
++    bool "libtuntap"
++    help
++      The portable Tun/Tap devices configuration utility
++
++      https://github.com/LaKabane/libtuntap
+diff --git a/package/libtuntap/libtuntap.mk b/package/libtuntap/libtuntap.mk
+new file mode 100755
+index 0000000000..c1cad0c2ce
+--- /dev/null
++++ b/package/libtuntap/libtuntap.mk
+@@ -0,0 +1,12 @@
++LIBTUNTAP_VERSION := bf8e0fe
++LIBTUNTAP_SITE := https://github.com/tvelliott/libtuntap.git
++LIBTUNTAP_SITE_METHOD := git
++LIBTUNTAP_INSTALL_STAGING := YES
++LIBTUNTAP_INSTALL_TARGET := YES
++
++define LIBTUNTAP_INSTALL_STAGING_CMDS
++	$(INSTALL) -D -m 0644 $(@D)/*.h $(STAGING_DIR)/usr/include/
++	$(INSTALL) -D -m 0644 $(@D)/lib/* $(STAGING_DIR)/usr/lib/
++endef
++
++$(eval $(cmake-package))
+diff --git a/package/luaradio-basic/Config.in b/package/luaradio-basic/Config.in
+new file mode 100755
+index 0000000000..ea9e63dfc2
+--- /dev/null
++++ b/package/luaradio-basic/Config.in
+@@ -0,0 +1,11 @@
++config BR2_PACKAGE_LUARADIO_BASIC
++        bool "luaradio-basic"
++       select BR2_PACKAGE_LUAJIT
++
++        help
++         A lightweight, embeddable software-defined radio framework built on LuaJIT 
++
++
++	  http://luaradio.io
++
++ 
+diff --git a/package/luaradio-basic/Makefile b/package/luaradio-basic/Makefile
+new file mode 100755
+index 0000000000..cbdd1ae8cf
+--- /dev/null
++++ b/package/luaradio-basic/Makefile
+@@ -0,0 +1,176 @@
++SRC_DIR = ..
++EXAMPLE_DIR = examples
++TEST_DIR = tests
++BUILD_DIR = build
++GEN_DIR = $(BUILD_DIR)/gen
++PKG_CONFIG_PATH=/home/eric/pluto032/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/lib/pkgconfig
++CC=/home/eric/pluto032/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-cc
++################################################################################
++
++LIBNAME = luaradio
++LIB_SRCS = luaradio.c
++LUA_SRCS = $(shell find $(SRC_DIR)/radio -type f -name "*.lua")
++
++EXAMPLE_SRCS = $(EXAMPLE_DIR)/fm-radio.c $(EXAMPLE_DIR)/rds-timesync.c
++TEST_SRCS = $(TEST_DIR)/test_api.c
++
++################################################################################
++
++ifneq ($(shell uname -s),Darwin)
++SHARED_LIB = $(BUILD_DIR)/lib$(LIBNAME).so
++else
++SHARED_LIB = $(BUILD_DIR)/lib$(LIBNAME).dylib
++endif
++
++STATIC_LIB = $(BUILD_DIR)/lib$(LIBNAME).a
++
++LUA_C_SRCS := $(patsubst $(SRC_DIR)/%.lua, $(GEN_DIR)/%.c, $(LUA_SRCS))
++LIB_OBJS := $(patsubst $(GEN_DIR)/%.c, $(BUILD_DIR)/%.o, $(LUA_C_SRCS)) $(patsubst %.c, $(BUILD_DIR)/%.o, $(LIB_SRCS))
++
++EXAMPLE_BINS = $(patsubst $(EXAMPLE_DIR)/%.c, $(BUILD_DIR)/$(EXAMPLE_DIR)/%, $(EXAMPLE_SRCS))
++TEST_BINS = $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/$(TEST_DIR)/%, $(TEST_SRCS))
++
++################################################################################
++
++ifneq ($(shell pkg-config luajit 2>/dev/null; echo $$?), 0)
++$(error "LuaJIT library not found with pkg-config")
++endif
++
++ifneq ($(shell which luajit 2>/dev/null),)
++LUAJIT ?= luajit
++else
++LUAJIT ?= luajit-$(shell pkg-config --modversion luajit)
++endif
++
++ifneq ($(shell $(LUAJIT) -v 1>/dev/null 2>/dev/null; echo $$?), 0)
++$(error "LuaJIT executable not found")
++endif
++
++INSTALL_CMOD = $(shell pkg-config luajit --variable INSTALL_CMOD)
++
++PREFIX ?= /usr/local
++
++################################################################################
++
++OPT = -O3
++DEBUG =
++
++VERSION_MAJOR := $(shell cd ../; $(LUAJIT) -e "package.path = './?/init.lua;' .. package.path; print(require('radio').version_info.major)" 2>/dev/null)
++VERSION_MINOR := $(shell cd ../; $(LUAJIT) -e "package.path = './?/init.lua;' .. package.path; print(require('radio').version_info.minor)" 2>/dev/null)
++VERSION_PATCH := $(shell cd ../; $(LUAJIT) -e "package.path = './?/init.lua;' .. package.path; print(require('radio').version_info.patch)" 2>/dev/null)
++VERSION_COMMIT := $(shell git describe --abbrev --always --tags --dirty 2>/dev/null || echo "")
++
++CFLAGS = -std=c99 -D_DEFAULT_SOURCE
++CFLAGS += $(shell pkg-config --cflags luajit)
++CFLAGS += -fPIC
++CFLAGS += $(OPT) $(DEBUG) $(INCLUDES)
++CFLAGS += -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_PATCH=$(VERSION_PATCH)
++CFLAGS += -DVERSION_COMMIT=\"$(VERSION_COMMIT)\"
++CFLAGS += -Wall -Wextra -Wcast-align -Wcast-qual -Wimplicit
++CFLAGS += -Wpointer-arith -Wswitch -Wredundant-decls -Wreturn-type
++CFLAGS += -Wshadow -Wunused -Wno-unused-parameter
++
++LIBFLAGS = $(shell pkg-config --libs luajit)
++
++ifneq ($(shell uname -s),Darwin)
++LDFLAGS = -Wl,-E
++EXTRA_LDFLAGS =
++else
++LDFLAGS =
++EXTRA_LDFLAGS = -pagezero_size 10000 -image_base 100000000
++endif
++
++################################################################################
++
++.PHONY: all
++all: lib tests examples
++
++.PHONY: lib
++lib: $(SHARED_LIB) $(STATIC_LIB)
++
++.PHONY: examples
++examples: $(SHARED_LIB) $(EXAMPLE_BINS)
++
++.PHONY: tests
++tests: $(SHARED_LIB) $(TEST_BINS)
++
++.PHONY: runtests
++runtests: $(TEST_BINS)
++	for f in $(TEST_BINS); do \
++		LD_LIBRARY_PATH=$(BUILD_DIR) DYLD_LIBRARY_PATH=$(BUILD_DIR) ./$$f; \
++	done
++
++ifneq ($(shell uname -s),Darwin)
++.PHONY: install
++install: $(STATIC_LIB) $(SHARED_LIB)
++	install -d $(DESTDIR)$(PREFIX)/lib
++	install -m755 $(STATIC_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).a
++	install -m755 $(SHARED_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR)
++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).so
++	install -d $(DESTDIR)$(PREFIX)/include
++	install -m644 luaradio.h $(DESTDIR)$(PREFIX)/include/luaradio.h
++	install -d $(DESTDIR)$(INSTALL_CMOD)
++	ln -sf $(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(DESTDIR)$(INSTALL_CMOD)/radio.so
++	install -d $(DESTDIR)$(PREFIX)/bin
++	install -m755 ../luaradio $(DESTDIR)$(PREFIX)/bin/luaradio
++	install -d $(DESTDIR)$(PREFIX)/share/licenses/luaradio
++	install -m644 ../LICENSE $(DESTDIR)$(PREFIX)/share/licenses/luaradio/LICENSE
++else
++# Mac OS X install
++.PHONY: install
++install: $(STATIC_LIB) $(SHARED_LIB)
++	install -d $(DESTDIR)$(PREFIX)/lib
++	install -m755 $(STATIC_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).a
++	install -m755 $(SHARED_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).$(VERSION_MAJOR).dylib
++	ln -sf lib$(LIBNAME).$(VERSION_MAJOR).dylib $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).dylib
++	install -d $(DESTDIR)$(PREFIX)/include
++	install -m644 luaradio.h $(DESTDIR)$(PREFIX)/include/luaradio.h
++	install -d $(DESTDIR)$(INSTALL_CMOD)
++	ln -sf $(PREFIX)/lib/lib$(LIBNAME).$(VERSION_MAJOR).dylib $(DESTDIR)$(INSTALL_CMOD)/radio.so
++	install -d $(DESTDIR)$(PREFIX)/bin
++	install -m755 ../luaradio $(DESTDIR)$(PREFIX)/bin/luaradio
++	install -d $(DESTDIR)$(PREFIX)/share/licenses/luaradio
++	install -m644 ../LICENSE $(DESTDIR)$(PREFIX)/share/licenses/luaradio/LICENSE
++endif
++
++.PHONY: clean
++clean:
++	rm -rf $(BUILD_DIR)
++
++################################################################################
++
++$(BUILD_DIR)/$(TEST_DIR)/%: $(TEST_DIR)/%.c $(SHARED_LIB)
++	@mkdir -p $(dir $@)
++	$(CC) $(CFLAGS) -I./ $< -o $@ -L$(BUILD_DIR) -l$(LIBNAME) $(LIBFLAGS) $(LDFLAGS) $(EXTRA_LDFLAGS)
++
++$(BUILD_DIR)/$(EXAMPLE_DIR)/%: $(EXAMPLE_DIR)/%.c $(SHARED_LIB)
++	@mkdir -p $(dir $@)
++	$(CC) $(CFLAGS) -I./ $< -o $@ -L$(BUILD_DIR) -l$(LIBNAME) $(LIBFLAGS) $(LDFLAGS) $(EXTRA_LDFLAGS)
++
++$(STATIC_LIB): $(LIB_OBJS)
++	/home/eric/pluto032/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-ar -rcs $@ $^
++
++ifneq ($(shell uname -s),Darwin)
++$(SHARED_LIB): $(LIB_OBJS)
++	$(CC) $(CFLAGS) -shared -Wl,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR) -o $@.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $^ $(LDFLAGS)
++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $@.$(VERSION_MAJOR)
++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $@
++else
++# Mac OS X shared library build
++$(SHARED_LIB): $(LIB_OBJS)
++	$(CC) $(CFLAGS) -dynamiclib -Wl,-undefined -Wl,dynamic_lookup -install_name "lib$(LIBNAME).$(VERSION_MAJOR).dylib" -current_version $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) -compatibility_version $(VERSION_MAJOR).$(VERSION_MINOR) -o $(subst .dylib,.$(VERSION_MAJOR).dylib,$@) $^ $(LDFLAGS)
++	ln -sf lib$(LIBNAME).$(VERSION_MAJOR).dylib $@
++endif
++
++$(BUILD_DIR)/%.o: %.c
++	$(CC) $(CFLAGS) -c $< -o $@
++
++$(BUILD_DIR)/%.o: $(GEN_DIR)/%.c
++	@mkdir -p $(dir $@)
++	$(CC) $(CFLAGS) -c $< -o $@
++
++.SECONDARY: $(LUA_C_SRCS)
++$(GEN_DIR)/%.c: $(SRC_DIR)/%.lua
++	@mkdir -p $(dir $@)
++	$(LUAJIT) -bn $(subst .init, , $(subst /,., $(patsubst $(SRC_DIR)/%.lua, %, $<))) $< $@
+diff --git a/package/luaradio-basic/luaradio-basic.mk b/package/luaradio-basic/luaradio-basic.mk
+new file mode 100755
+index 0000000000..ce44fa435e
+--- /dev/null
++++ b/package/luaradio-basic/luaradio-basic.mk
+@@ -0,0 +1,43 @@
++################################################################################
++#
++#LUARADIO
++#
++################################################################################
++LUARADIO_BASIC_VERSION = 0.10.0
++LUARADIO_BASIC_SITE = https://github.com/vsergeev/luaradio/archive/v$(LUARADIO_BASIC_VERSION)
++#LUARADIO_SITE_METHOD = git
++
++LUARADIO_BASIC_INSTALL_STAGING = YES
++LUARADIO_BASIC_LICENSE = MIT
++LUARADIO_BASIC_LICENSE_FILES = LICENSE
++LUARADIO_BASIC_DEPENDENCIES += luajit
++
++#define_PLUTO_BUILD_CMDS
++#	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) PREFIX=/usr -C $(@D)
++#endef
++
++#define LIBINST
++#  cd /home/eric/plutosdr-fw/buildroot/output/build/luaradio-0.5.1/embed
++#  make lib
++#endef
++#lib: $(MAKE) -C embed
++define LUARADIO_BASIC_BUILD_CMDS
++
++        mkdir -p $(TARGET_DIR)/root/luaradio/radio
++        cp -R $(@D)/radio/* $(TARGET_DIR)/root/luaradio/radio
++        $(INSTALL) -D -m 755 $(@D)/luaradio $(TARGET_DIR)/root/luaradio/luaradio
++
++
++endef
++
++$(eval $(generic-package))
++
++
++define LUARADIO_BASIC_INSTALL_TARGET_CMDS
++
++        mkdir -p $(TARGET_DIR)/root/luaradio/radio
++        cp -R $(@D)/radio/* $(TARGET_DIR)/root/luaradio/radio
++        $(INSTALL) -D -m 755 $(@D)/luaradio $(TARGET_DIR)/root/luaradio/luaradio
++
++endef
++
+diff --git a/package/luaradio-basic/readme.patch.txt b/package/luaradio-basic/readme.patch.txt
+new file mode 100755
+index 0000000000..c22e91cc33
+--- /dev/null
++++ b/package/luaradio-basic/readme.patch.txt
+@@ -0,0 +1,165 @@
++new file mode 100644
++--- a/embed/Makefile	1999-12-12 02:49:52.514648099 +0200
+++++ b/Makefile	2018-10-12 02:49:52.514648099 +0200
++@@ -0,0 +1,161 @@
+++SRC_DIR = .
+++EXAMPLE_DIR = embed/examples
+++TEST_DIR = embed/tests
+++BUILD_DIR = build
+++GEN_DIR = $(BUILD_DIR)/gen
+++
+++################################################################################
+++
+++LIBNAME = luaradio
+++LIB_SRCS = luaradio.c
+++LUA_SRCS = $(shell find $(SRC_DIR)/radio -type f -name "*.lua")
+++
+++EXAMPLE_SRCS = $(EXAMPLE_DIR)/fm-radio.c $(EXAMPLE_DIR)/rds-timesync.c
+++TEST_SRCS = $(TEST_DIR)/test_api.c
+++
+++################################################################################
+++
+++ifneq ($(shell uname -s),Darwin)
+++SHARED_LIB = $(BUILD_DIR)/lib$(LIBNAME).so
+++else
+++SHARED_LIB = $(BUILD_DIR)/lib$(LIBNAME).dylib
+++endif
+++
+++STATIC_LIB = $(BUILD_DIR)/lib$(LIBNAME).a
+++
+++LUA_C_SRCS := $(patsubst $(SRC_DIR)/%.lua, $(GEN_DIR)/%.c, $(LUA_SRCS))
+++LIB_OBJS := $(patsubst $(GEN_DIR)/%.c, $(BUILD_DIR)/%.o, $(LUA_C_SRCS)) $(patsubst %.c, $(BUILD_DIR)/%.o, $(LIB_SRCS))
+++
+++EXAMPLE_BINS = $(patsubst $(EXAMPLE_DIR)/%.c, $(BUILD_DIR)/$(EXAMPLE_DIR)/%, $(EXAMPLE_SRCS))
+++TEST_BINS = $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/$(TEST_DIR)/%, $(TEST_SRCS))
+++
+++PREFIX ?= /usr
+++
+++INSTALL_CMOD = $(shell pkg-config luajit --variable INSTALL_CMOD)
+++
+++################################################################################
+++
+++OPT = -O3
+++DEBUG =
+++
+++VERSION_MAJOR := $(shell cd ../; luajit -e "package.path = './?/init.lua;' .. package.path; print(require('radio').version_info.major)")
+++VERSION_MINOR := $(shell cd ../; luajit -e "package.path = './?/init.lua;' .. package.path; print(require('radio').version_info.minor)")
+++VERSION_PATCH := $(shell cd ../; luajit -e "package.path = './?/init.lua;' .. package.path; print(require('radio').version_info.patch)")
+++VERSION_COMMIT := $(shell git describe --abbrev --always --tags --dirty 2>/dev/null || echo "")
+++
+++CFLAGS = -std=c99 -D_DEFAULT_SOURCE
+++CFLAGS += $(shell pkg-config --cflags luajit)
+++CFLAGS += -fPIC -lpthread
+++CFLAGS += $(OPT) $(DEBUG) $(INCLUDES)
+++CFLAGS += -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_PATCH=$(VERSION_PATCH)
+++CFLAGS += -DVERSION_COMMIT=\"$(VERSION_COMMIT)\"
+++CFLAGS += -Wall -Wextra -Wcast-align -Wcast-qual -Wimplicit
+++CFLAGS += -Wpointer-arith -Wswitch -Wredundant-decls -Wreturn-type
+++CFLAGS += -Wshadow -Wunused -Wno-unused-parameter
+++
+++LIBFLAGS = $(shell pkg-config --libs luajit)
+++
+++ifneq ($(shell uname -s),Darwin)
+++LDFLAGS = -Wl,-E
+++EXTRA_LDFLAGS =
+++else
+++LDFLAGS =
+++EXTRA_LDFLAGS = -pagezero_size 10000 -image_base 100000000
+++endif
+++
+++LUAJIT = luajit
+++
+++################################################################################
+++
+++.PHONY: all
+++all: lib install examples
+++
+++.PHONY: lib
+++lib: $(SHARED_LIB) $(STATIC_LIB)
+++
+++.PHONY: examples
+++examples:  $(SHARED_LIB) $(EXAMPLE_BINS)
+++
+++.PHONY: tests
+++tests: $(SHARED_LIB) $(TEST_BINS)
+++
+++.PHONY: runtests
+++runtests: $(TEST_BINS)
+++	for f in $(TEST_BINS); do \
+++		LD_LIBRARY_PATH=$(BUILD_DIR) DYLD_LIBRARY_PATH=$(BUILD_DIR) ./$$f; \
+++	done
+++
+++ifneq ($(shell uname -s),Darwin)
+++.PHONY: install
+++install: $(STATIC_LIB) $(SHARED_LIB)
+++	install -d $(DESTDIR)$(PREFIX)/lib
+++	install -m755 $(STATIC_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).a
+++	install -m755 $(SHARED_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
+++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR)
+++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).so
+++	install -d $(DESTDIR)$(PREFIX)/include
+++	install -m644 luaradio.h $(DESTDIR)$(PREFIX)/include/luaradio.h
+++	install -d $(DESTDIR)$(INSTALL_CMOD)
+++	ln -sf $(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(DESTDIR)$(INSTALL_CMOD)/radio.so
+++	install -d $(DESTDIR)$(PREFIX)/bin
+++	install -m755 ../luaradio $(DESTDIR)$(PREFIX)/bin/luaradio
+++	install -d $(DESTDIR)$(PREFIX)/share/licenses/luaradio
+++	install -m644 ../LICENSE $(DESTDIR)$(PREFIX)/share/licenses/luaradio/LICENSE
+++else
+++# Mac OS X install
+++.PHONY: install
+++install: $(STATIC_LIB) $(SHARED_LIB)
+++	install -d $(DESTDIR)$(PREFIX)/lib
+++	install -m755 $(STATIC_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).a
+++	install -m755 $(SHARED_LIB) $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).$(VERSION_MAJOR).dylib
+++	ln -sf lib$(LIBNAME).$(VERSION_MAJOR).dylib $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).dylib
+++	install -d $(DESTDIR)$(PREFIX)/include
+++	install -m644 luaradio.h $(DESTDIR)$(PREFIX)/include/luaradio.h
+++	install -d $(DESTDIR)$(INSTALL_CMOD)
+++	ln -sf $(PREFIX)/lib/lib$(LIBNAME).$(VERSION_MAJOR).dylib $(DESTDIR)$(INSTALL_CMOD)/radio.so
+++	install -d $(DESTDIR)$(PREFIX)/bin
+++	install -m755 ../luaradio $(DESTDIR)$(PREFIX)/bin/luaradio
+++	install -d $(DESTDIR)$(PREFIX)/share/licenses/luaradio
+++	install -m644 ../LICENSE $(DESTDIR)$(PREFIX)/share/licenses/luaradio/LICENSE
+++endif
+++
+++.PHONY: clean
+++clean:
+++	rm -rf $(BUILD_DIR)
+++
+++################################################################################
+++
+++$(BUILD_DIR)/$(TEST_DIR)/%: $(TEST_DIR)/%.c $(SHARED_LIB)
+++	@mkdir -p $(dir $@)
+++	$(CC) $(CFLAGS) -I./ $< -o $@ -L$(BUILD_DIR) -l$(LIBNAME) $(LIBFLAGS) $(LDFLAGS) $(EXTRA_LDFLAGS)
+++
+++$(BUILD_DIR)/$(EXAMPLE_DIR)/%: $(EXAMPLE_DIR)/%.c $(SHARED_LIB)
+++	@mkdir -p $(dir $@)
+++	$(CC) $(CFLAGS) -I./ $< -o $@ -L$(BUILD_DIR) -l$(LIBNAME) $(LIBFLAGS) $(LDFLAGS) $(EXTRA_LDFLAGS)
+++
+++$(STATIC_LIB): $(LIB_OBJS)
+++	ar rcs $@ $^
+++
+++ifneq ($(shell uname -s),Darwin)
+++$(SHARED_LIB): $(LIB_OBJS)
+++	$(CC) $(CFLAGS) -shared -Wl,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR) -o $@.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $^ $(LDFLAGS)
+++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $@.$(VERSION_MAJOR)
+++	ln -sf lib$(LIBNAME).so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $@
+++else
+++# Mac OS X shared library build
+++$(SHARED_LIB): $(LIB_OBJS)
+++	$(CC) $(CFLAGS) -dynamiclib -Wl,-undefined -Wl,dynamic_lookup -install_name "lib$(LIBNAME).$(VERSION_MAJOR).dylib" -current_version $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) -compatibility_version $(VERSION_MAJOR).$(VERSION_MINOR) -o $(subst .dylib,.$(VERSION_MAJOR).dylib,$@) $^ $(LDFLAGS)
+++	ln -sf lib$(LIBNAME).$(VERSION_MAJOR).dylib $@
+++endif
+++
+++$(BUILD_DIR)/%.o: %.c
+++	$(CC) $(CFLAGS) -c $< -o $@
+++
+++$(BUILD_DIR)/%.o: $(GEN_DIR)/%.c
+++	@mkdir -p $(dir $@)
+++	$(CC) $(CFLAGS) -c $< -o $@
+++
+++.SECONDARY: $(LUA_C_SRCS)
+++$(GEN_DIR)/%.c: $(SRC_DIR)/%.lua
+++	@mkdir -p $(dir $@)
+++	$(LUAJIT) -bn $(subst .init, , $(subst /,.,$(patsubst $(SRC_DIR)/%.lua, %, $<))) $< $@
+diff --git a/package/multimonng/Config.in b/package/multimonng/Config.in
+new file mode 100755
+index 0000000000..7ee4866b21
+--- /dev/null
++++ b/package/multimonng/Config.in
+@@ -0,0 +1,9 @@
++config BR2_PACKAGE_MULTIMONNG
++	bool "multimonng"
++	help
++	  HAMRADIO : multimon-ng decodes the following digital transmission modes:
++          POCSAG512 POCSAG1200 POCSAG2400 FLEX EAS UFSK1200 CLIPFSK 
++          AFSK1200 AFSK2400 AFSK2400_2 AFSK2400_3 HAPN4800 FSK9600 DTMF
++          ZVEI1 ZVEI2 ZVEI3 DZVEI PZVEI EEA EIA CCIR MORSE CW X10
++
++	  https://github.com/EliasOenal/multimon-ng
+diff --git a/package/multimonng/multimonng.hash b/package/multimonng/multimonng.hash
+new file mode 100755
+index 0000000000..dc5a4b1399
+--- /dev/null
++++ b/package/multimonng/multimonng.hash
+@@ -0,0 +1 @@
++sha1	12aa10d5fb6760237ab3204c50578185ba5057fe  1.1.9.tar.gz
+diff --git a/package/multimonng/multimonng.mk b/package/multimonng/multimonng.mk
+new file mode 100755
+index 0000000000..23f0ee1169
+--- /dev/null
++++ b/package/multimonng/multimonng.mk
+@@ -0,0 +1,24 @@
++################################################################################
++#
++# MULTIMONNG
++#
++################################################################################
++
++
++MULTIMONNG_VERSION = 1.1.9
++MULTIMONNG_SITE = https://github.com/EliasOenal/multimon-ng/archive/refs/tags
++MULTIMONNG_SOURCE = $(MULTIMONNG_VERSION).tar.gz
++
++
++MULTIMONNG_INSTALL_STAGING = YES
++MULTIMONNG_LICENSE = GPL-2.0
++MULTIMONNG_LICENSE_FILES = COPYING
++#MULTIMONNG_DEPENDENCIES = 
++#MULTIMONNG_SITE_METHOD = git
++
++
++
++
++$(eval $(cmake-package))
++
++
+diff --git a/package/python3/0001-Make-the-build-of-pyc-files-conditional.patch b/package/python3/0001-Make-the-build-of-pyc-files-conditional.patch
+index 44902725d7..d3b5368903 100644
+--- a/package/python3/0001-Make-the-build-of-pyc-files-conditional.patch
++++ b/package/python3/0001-Make-the-build-of-pyc-files-conditional.patch
+@@ -18,7 +18,7 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
+ index 77f91e72b1..0c809f3d8a 100644
+ --- a/Makefile.pre.in
+ +++ b/Makefile.pre.in
+-@@ -1550,6 +1550,7 @@ libinstall:	build_all $(srcdir)/Modules/xxmodule.c
++@@ -1600,6 +1600,7 @@ libinstall:	build_all $(srcdir)/Modules/xxmodule.c
+  		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
+  			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
+  	fi
+@@ -26,7 +26,7 @@ index 77f91e72b1..0c809f3d8a 100644
+  	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
+  		$(PYTHON_FOR_BUILD) -Wi $(DESTDIR)$(LIBDEST)/compileall.py \
+  		-j0 -d $(LIBDEST) -f \
+-@@ -1577,6 +1578,7 @@ libinstall:	build_all $(srcdir)/Modules/xxmodule.c
++@@ -1627,6 +1628,7 @@ libinstall:	build_all $(srcdir)/Modules/xxmodule.c
+  		$(PYTHON_FOR_BUILD) -Wi -OO $(DESTDIR)$(LIBDEST)/compileall.py \
+  		-j0 -d $(LIBDEST)/site-packages -f \
+  		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
+@@ -38,7 +38,7 @@ diff --git a/configure.ac b/configure.ac
+ index d60f05251a..1ee5a09588 100644
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1121,6 +1121,12 @@ fi
++@@ -1110,6 +1110,12 @@ fi
+  
+  AC_MSG_CHECKING(LDLIBRARY)
+  
+diff --git a/package/python3/0002-Disable-buggy_getaddrinfo-configure-test-when-cross-.patch b/package/python3/0002-Disable-buggy_getaddrinfo-configure-test-when-cross-.patch
+index 00177814cc..411b8dae4e 100644
+--- a/package/python3/0002-Disable-buggy_getaddrinfo-configure-test-when-cross-.patch
++++ b/package/python3/0002-Disable-buggy_getaddrinfo-configure-test-when-cross-.patch
+@@ -13,7 +13,7 @@ diff --git a/configure.ac b/configure.ac
+ index 1ee5a09588..c2445edc88 100644
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -4210,7 +4210,7 @@ fi
++@@ -4230,7 +4230,7 @@ fi
+  
+  AC_MSG_RESULT($ac_cv_buggy_getaddrinfo)
+  
+diff --git a/package/python3/0003-Add-infrastructure-to-disable-the-build-of-certain-e.patch b/package/python3/0003-Add-infrastructure-to-disable-the-build-of-certain-e.patch
+index 7cccc588e9..7ac0f39d06 100644
+--- a/package/python3/0003-Add-infrastructure-to-disable-the-build-of-certain-e.patch
++++ b/package/python3/0003-Add-infrastructure-to-disable-the-build-of-certain-e.patch
+@@ -47,7 +47,7 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
+ index 0c809f3d8a..7c3dde8dd4 100644
+ --- a/Makefile.pre.in
+ +++ b/Makefile.pre.in
+-@@ -216,6 +216,8 @@ FILEMODE=	644
++@@ -218,6 +218,8 @@ FILEMODE=	644
+  # configure script arguments
+  CONFIG_ARGS=	@CONFIG_ARGS@
+  
+@@ -56,7 +56,7 @@ index 0c809f3d8a..7c3dde8dd4 100644
+  
+  # Subdirectories with code
+  SRCDIRS= 	@SRCDIRS@
+-@@ -632,6 +634,7 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
++@@ -628,6 +630,7 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+  	esac; \
+  	echo "$(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' \
+  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
+@@ -64,7 +64,7 @@ index 0c809f3d8a..7c3dde8dd4 100644
+  		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build"; \
+  	$(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' \
+  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
+-@@ -1696,7 +1699,8 @@ libainstall:	@DEF_MAKE_RULE@ python-config
++@@ -1748,7 +1751,8 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+  # Install the dynamically loadable modules
+  # This goes into $(exec_prefix)
+  sharedinstall: sharedmods
+@@ -78,7 +78,7 @@ diff --git a/configure.ac b/configure.ac
+ index c2445edc88..73d66167de 100644
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -3081,6 +3081,8 @@ LIBS="$withval $LIBS"
++@@ -3091,6 +3091,8 @@ LIBS="$withval $LIBS"
+  
+  PKG_PROG_PKG_CONFIG
+  
+@@ -91,8 +91,8 @@ diff --git a/setup.py b/setup.py
+ index 770866bca7..b6c829b3a5 100644
+ --- a/setup.py
+ +++ b/setup.py
+-@@ -44,7 +44,10 @@ from distutils.spawn import find_executable
+- TEST_EXTENSIONS = True
++@@ -58,7 +58,10 @@ with warnings.catch_warnings():
++ TEST_EXTENSIONS = (sysconfig.get_config_var('TEST_MODULES') == 'yes')
+  
+  # This global variable is used to hold the list of modules to be disabled.
+ -DISABLED_MODULE_LIST = []
+@@ -101,8 +101,8 @@ index 770866bca7..b6c829b3a5 100644
+ +except KeyError:
+ +    DISABLED_MODULE_LIST = list()
+  
+- 
+- def get_platform():
++ # --list-module-names option used by Tools/scripts/generate_module_names.py
++ LIST_MODULE_NAMES = False
+ -- 
+ 2.25.1
+ 
+diff --git a/package/python3/0004-Adjust-library-header-paths-for-cross-compilation.patch b/package/python3/0004-Adjust-library-header-paths-for-cross-compilation.patch
+index 24f369f87f..0311348405 100644
+--- a/package/python3/0004-Adjust-library-header-paths-for-cross-compilation.patch
++++ b/package/python3/0004-Adjust-library-header-paths-for-cross-compilation.patch
+@@ -15,13 +15,15 @@ values, and get correct header/library paths when cross-compiling
+ third-party Python modules.
+ 
+ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
++Signed-off-by: Adam Duskett <aduskett@gmail.com>
++Refresh for 3.10.0
+ ---
+  Lib/distutils/command/build_ext.py |  5 ++++-
+- Lib/distutils/sysconfig.py         | 15 +++++++++++----
++ Lib/sysconfig.py                   | 15 +++++++++++----
+  2 files changed, 15 insertions(+), 5 deletions(-)
+ 
+ diff --git a/Lib/distutils/command/build_ext.py b/Lib/distutils/command/build_ext.py
+-index 1a9bd1200f..3cf7d6746e 100644
++index 1a9bd12..3cf7d67 100644
+ --- a/Lib/distutils/command/build_ext.py
+ +++ b/Lib/distutils/command/build_ext.py
+ @@ -234,7 +234,10 @@ class build_ext(Command):
+@@ -36,32 +38,32 @@ index 1a9bd1200f..3cf7d6746e 100644
+              else:
+                  # building python standard extensions
+                  self.library_dirs.append('.')
+-diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+-index 37feae5df7..e9c3a27856 100644
+---- a/Lib/distutils/sysconfig.py
+-+++ b/Lib/distutils/sysconfig.py
+-@@ -17,10 +17,17 @@ import sys
+- from .errors import DistutilsPlatformError
+- 
+- # These are needed in a couple of spots, so just compute them once.
+--PREFIX = os.path.normpath(sys.prefix)
+--EXEC_PREFIX = os.path.normpath(sys.exec_prefix)
+--BASE_PREFIX = os.path.normpath(sys.base_prefix)
+--BASE_EXEC_PREFIX = os.path.normpath(sys.base_exec_prefix)
++diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
++index 95b48f6..9fb1956 100644
++--- a/Lib/sysconfig.py
+++++ b/Lib/sysconfig.py
++@@ -123,10 +123,17 @@ _SCHEME_KEYS = ('stdlib', 'platstdlib', 'purelib', 'platlib', 'include',
++ _PY_VERSION = sys.version.split()[0]
++ _PY_VERSION_SHORT = f'{sys.version_info[0]}.{sys.version_info[1]}'
++ _PY_VERSION_SHORT_NO_DOT = f'{sys.version_info[0]}{sys.version_info[1]}'
++-_PREFIX = os.path.normpath(sys.prefix)
++-_BASE_PREFIX = os.path.normpath(sys.base_prefix)
++-_EXEC_PREFIX = os.path.normpath(sys.exec_prefix)
++-_BASE_EXEC_PREFIX = os.path.normpath(sys.base_exec_prefix)
+ +if "_python_sysroot" in os.environ:
+ +    _sysroot=os.environ.get('_python_sysroot')
+-+    PREFIX = os.path.normpath(_sysroot + os.environ.get('_python_prefix'))
+-+    EXEC_PREFIX = os.path.normpath(_sysroot + os.environ.get('_python_exec_prefix'))
+-+    BASE_PREFIX = PREFIX
+-+    BASE_EXEC_PREFIX = EXEC_PREFIX
+++    _PREFIX = os.path.normpath(_sysroot + os.environ.get('_python_prefix'))
+++    _EXEC_PREFIX = os.path.normpath(_sysroot + os.environ.get('_python_exec_prefix'))
+++    _BASE_PREFIX = _PREFIX
+++    _BASE_EXEC_PREFIX = _EXEC_PREFIX
+ +else:
+-+    PREFIX = os.path.normpath(sys.prefix)
+-+    EXEC_PREFIX = os.path.normpath(sys.exec_prefix)
+-+    BASE_PREFIX = os.path.normpath(sys.base_prefix)
+-+    BASE_EXEC_PREFIX = os.path.normpath(sys.base_exec_prefix)
+++    _PREFIX = os.path.normpath(sys.prefix)
+++    _EXEC_PREFIX = os.path.normpath(sys.exec_prefix)
+++    _BASE_PREFIX = os.path.normpath(sys.base_prefix)
+++    _BASE_EXEC_PREFIX = os.path.normpath(sys.base_exec_prefix)
++ _CONFIG_VARS = None
++ _USER_BASE = None
+  
+- # Path to the base directory of the project. On Windows the binary may
+- # live in project/PCbuild/win32 or project/PCbuild/amd64.
+ -- 
+-2.25.1
++2.30.2
+ 
+diff --git a/package/python3/0005-Don-t-look-in-usr-lib-termcap-for-libraries.patch b/package/python3/0005-Don-t-look-in-usr-lib-termcap-for-libraries.patch
+index c5abcfd786..3e224995a5 100644
+--- a/package/python3/0005-Don-t-look-in-usr-lib-termcap-for-libraries.patch
++++ b/package/python3/0005-Don-t-look-in-usr-lib-termcap-for-libraries.patch
+@@ -9,10 +9,10 @@ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+  1 file changed, 1 insertion(+), 4 deletions(-)
+ 
+ diff --git a/setup.py b/setup.py
+-index b6c829b3a5..ec3ba60607 100644
++index 66d372a..e632b6f 100644
+ --- a/setup.py
+ +++ b/setup.py
+-@@ -1041,12 +1041,9 @@ class PyBuildExt(build_ext):
++@@ -1147,12 +1147,9 @@ class PyBuildExt(build_ext):
+                  pass # Issue 7384: Already linked against curses or tinfo.
+              elif curses_library:
+                  readline_libs.append(curses_library)
+diff --git a/package/python3/0006-Don-t-add-multiarch-paths.patch b/package/python3/0006-Don-t-add-multiarch-paths.patch
+index bb861612b1..48d8cc790e 100644
+--- a/package/python3/0006-Don-t-add-multiarch-paths.patch
++++ b/package/python3/0006-Don-t-add-multiarch-paths.patch
+@@ -20,7 +20,7 @@ diff --git a/setup.py b/setup.py
+ index ec3ba60607..e27620035c 100644
+ --- a/setup.py
+ +++ b/setup.py
+-@@ -734,10 +734,10 @@ class PyBuildExt(build_ext):
++@@ -830,10 +830,10 @@ class PyBuildExt(build_ext):
+          if not CROSS_COMPILING:
+              add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
+              add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+diff --git a/package/python3/0007-Abort-on-failed-module-build.patch b/package/python3/0007-Abort-on-failed-module-build.patch
+index 856fcaac21..32e2261a05 100644
+--- a/package/python3/0007-Abort-on-failed-module-build.patch
++++ b/package/python3/0007-Abort-on-failed-module-build.patch
+@@ -17,7 +17,7 @@ diff --git a/setup.py b/setup.py
+ index e27620035c..d3f0e663f2 100644
+ --- a/setup.py
+ +++ b/setup.py
+-@@ -524,6 +524,7 @@ class PyBuildExt(build_ext):
++@@ -561,6 +561,7 @@ class PyBuildExt(build_ext):
+              print("Failed to build these modules:")
+              print_three_column(failed)
+              print()
+diff --git a/package/python3/0012-Add-importlib-fix-for-PEP-3147-issue.patch b/package/python3/0011-Add-importlib-fix-for-PEP-3147-issue.patch
+old mode 100644
+new mode 100755
+similarity index 95%
+rename from package/python3/0012-Add-importlib-fix-for-PEP-3147-issue.patch
+rename to package/python3/0011-Add-importlib-fix-for-PEP-3147-issue.patch
+index 7a885303cb..b18f94ab4e
+--- a/package/python3/0012-Add-importlib-fix-for-PEP-3147-issue.patch
++++ b/package/python3/0011-Add-importlib-fix-for-PEP-3147-issue.patch
+@@ -28,7 +28,7 @@ diff --git a/Lib/importlib/_bootstrap_external.py b/Lib/importlib/_bootstrap_ext
+ index 25a3f8c0e0..2cb9a9aa52 100644
+ --- a/Lib/importlib/_bootstrap_external.py
+ +++ b/Lib/importlib/_bootstrap_external.py
+-@@ -373,8 +373,6 @@ def cache_from_source(path, debug_override=None, *, optimization=None):
++@@ -392,8 +392,6 @@ def cache_from_source(path, debug_override=None, *, optimization=None):
+      a True value is the same as setting 'optimization' to the empty string
+      while a False value is equivalent to setting 'optimization' to '1'.
+  
+@@ -37,7 +37,7 @@ index 25a3f8c0e0..2cb9a9aa52 100644
+      """
+      if debug_override is not None:
+          _warnings.warn('the debug_override parameter is deprecated; use '
+-@@ -386,10 +384,7 @@ def cache_from_source(path, debug_override=None, *, optimization=None):
++@@ -405,10 +403,7 @@ def cache_from_source(path, debug_override=None, *, optimization=None):
+      path = _os.fspath(path)
+      head, tail = _path_split(path)
+      base, sep, rest = tail.rpartition('.')
+@@ -49,7 +49,7 @@ index 25a3f8c0e0..2cb9a9aa52 100644
+      if optimization is None:
+          if sys.flags.optimize == 0:
+              optimization = ''
+-@@ -426,46 +421,17 @@ def cache_from_source(path, debug_override=None, *, optimization=None):
++@@ -445,46 +440,17 @@ def cache_from_source(path, debug_override=None, *, optimization=None):
+              head.lstrip(path_separators),
+              filename,
+          )
+diff --git a/package/python3/0011-Override-system-locale-and-set-to-default-when-addin.patch b/package/python3/0011-Override-system-locale-and-set-to-default-when-addin.patch
+deleted file mode 100644
+index 8b0d4f4c4d..0000000000
+--- a/package/python3/0011-Override-system-locale-and-set-to-default-when-addin.patch
++++ /dev/null
+@@ -1,39 +0,0 @@
+-From e4ae670e3489544a49dabd1618c32fe73504a7ba Mon Sep 17 00:00:00 2001
+-From: Samuel Cabrero <samuelcabrero@gmail.com>
+-Date: Wed, 23 Dec 2015 11:45:48 +0100
+-Subject: [PATCH] Override system locale and set to default when adding gcc
+- paths
+-
+-Forces the use of the default locale in the function
+-add_gcc_paths, which is called when cross compiling to add the
+-include and library paths. This is necessary because otherwise
+-the gcc output is localized and the output parsing fails, which
+-results in no paths added and detect_modules not able to find
+-any system library (eg. libz, libssl, etc.)
+-
+-[Thomas: patch taken from https://bugs.python.org/issue23767.]
+-
+-Signed-off-by: Samuel Cabrero <samuelcabrero@gmail.com>
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-[james.hilliard1@gmail.com: adapt to python 3.9]
+-Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
+----
+- setup.py | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/setup.py b/setup.py
+-index d3f0e663f2..926c16f58f 100644
+---- a/setup.py
+-+++ b/setup.py
+-@@ -680,7 +680,7 @@ class PyBuildExt(build_ext):
+-         tmpfile = os.path.join(self.build_temp, 'ccpaths')
+-         if not os.path.exists(self.build_temp):
+-             os.makedirs(self.build_temp)
+--        ret = run_command('%s -E -v - </dev/null 2>%s 1>/dev/null' % (cc, tmpfile))
+-+        ret = run_command('LC_ALL=C %s -E -v - </dev/null 2>%s 1>/dev/null' % (cc, tmpfile))
+-         is_gcc = False
+-         is_clang = False
+-         in_incdirs = False
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0013-Add-an-option-to-disable-installation-of-test-module.patch b/package/python3/0013-Add-an-option-to-disable-installation-of-test-module.patch
+deleted file mode 100644
+index 8c1b989361..0000000000
+--- a/package/python3/0013-Add-an-option-to-disable-installation-of-test-module.patch
++++ /dev/null
+@@ -1,117 +0,0 @@
+-From 0337342d413d13f437fd089de91faee70a8bf3f9 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:01:18 -0800
+-Subject: [PATCH] Add an option to disable installation of test modules
+-
+-The Python standard distribution comes with many test modules, that
+-are not necessarly useful on embedded targets.
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+-[james.hilliard1@gmail.com: adapt to python 3.9]
+-Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
+----
+- Makefile.pre.in | 56 ++++++++++++++++++++++++++++++++-----------------
+- configure.ac    |  5 +++++
+- 2 files changed, 42 insertions(+), 19 deletions(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index 7c3dde8dd4..204f293d53 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1406,8 +1406,29 @@ maninstall:	altmaninstall
+- 
+- # Install the library
+- XMLLIBSUBDIRS=  xml xml/dom xml/etree xml/parsers xml/sax
+--LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
+--		tkinter/test/test_ttk site-packages test \
+-+
+-+LIBSUBDIRS=	tkinter site-packages \
+-+		asyncio \
+-+		collections concurrent concurrent/futures encodings \
+-+		email email/mime \
+-+		ensurepip ensurepip/_bundled \
+-+		html json http dbm xmlrpc \
+-+		sqlite3 \
+-+		logging csv wsgiref urllib \
+-+		lib2to3 lib2to3/fixes lib2to3/pgen2 \
+-+		ctypes ctypes/macholib \
+-+		idlelib idlelib/Icons \
+-+		distutils distutils/command $(XMLLIBSUBDIRS) \
+-+		importlib \
+-+		turtledemo \
+-+		multiprocessing multiprocessing/dummy \
+-+		unittest \
+-+		venv venv/scripts venv/scripts/common venv/scripts/posix \
+-+		curses pydoc_data \
+-+		zoneinfo
+-+
+-+TESTSUBDIRS=	tkinter/test tkinter/test/test_tkinter \
+-+		tkinter/test/test_ttk test \
+- 		test/audiodata \
+- 		test/capath test/data \
+- 		test/cjkencodings test/decimaltestdata \
+-@@ -1468,28 +1489,25 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
+- 		test/test_importlib/zipdata02 \
+- 		test/test_zoneinfo test/test_zoneinfo/data \
+- 		test/ziptestdata \
+--		asyncio \
+- 		test/test_asyncio \
+--		collections concurrent concurrent/futures encodings \
+--		email email/mime test/test_email test/test_email/data \
+--		ensurepip ensurepip/_bundled \
+--		html json test/test_json http dbm xmlrpc \
+--		sqlite3 sqlite3/test \
+--		logging csv wsgiref urllib \
+--		lib2to3 lib2to3/fixes lib2to3/pgen2 lib2to3/tests \
+-+		test/test_email test/test_email/data \
+-+		test/test_json \
+-+		sqlite3/test \
+-+		lib2to3/tests \
+- 		lib2to3/tests/data lib2to3/tests/data/fixers \
+- 		lib2to3/tests/data/fixers/myfixes \
+--		ctypes ctypes/test ctypes/macholib \
+--		idlelib idlelib/Icons idlelib/idle_test \
+--		distutils distutils/command distutils/tests $(XMLLIBSUBDIRS) \
+-+		ctypes/test \
+-+		idlelib/idle_test \
+-+		distutils/tests \
+- 		test/test_peg_generator \
+-+		test/test_importlib test/test_importlib/builtin \
+- 		test/test_tools test/test_warnings test/test_warnings/data \
+--		turtledemo \
+--		multiprocessing multiprocessing/dummy \
+--		unittest unittest/test unittest/test/testmock \
+--		venv venv/scripts venv/scripts/common venv/scripts/posix \
+--		curses pydoc_data \
+--		zoneinfo
+-+		unittest/test unittest/test/testmock
+-+
+-+ifeq (@TEST_MODULES@,yes)
+-+LIBSUBDIRS += $(TESTSUBDIRS)
+-+endif
+-+
+- libinstall:	build_all $(srcdir)/Modules/xxmodule.c
+- 	@for i in $(SCRIPTDIR) $(LIBDEST); \
+- 	do \
+-diff --git a/configure.ac b/configure.ac
+-index 73d66167de..92e28d02ee 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3358,6 +3358,11 @@ if test "$posix_threads" = "yes"; then
+-       AC_CHECK_FUNCS(pthread_getcpuclockid)
+- fi
+- 
+-+AC_SUBST(TEST_MODULES)
+-+
+-+AC_ARG_ENABLE(test-modules,
+-+	AS_HELP_STRING([--disable-test-modules], [disable test modules]),
+-+	[ TEST_MODULES="${enableval}" ], [ TEST_MODULES=yes ])
+- 
+- # Check for enable-ipv6
+- AH_TEMPLATE(ENABLE_IPV6, [Define if --enable-ipv6 is specified])
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0014-Add-an-option-to-disable-pydoc.patch b/package/python3/0014-Add-an-option-to-disable-pydoc.patch
+deleted file mode 100644
+index 0c928a0bb2..0000000000
+--- a/package/python3/0014-Add-an-option-to-disable-pydoc.patch
++++ /dev/null
+@@ -1,99 +0,0 @@
+-From a65e5d3caf8e076d531191164c23c6240461f675 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:07:56 -0800
+-Subject: [PATCH] Add an option to disable pydoc
+-
+-It removes 0.5 MB of data from the target plus the pydoc script
+-itself.
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+----
+- Makefile.pre.in | 8 +++++++-
+- configure.ac    | 6 ++++++
+- setup.py        | 9 +++++++--
+- 3 files changed, 20 insertions(+), 3 deletions(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index 204f293d53..63e3df0470 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1374,7 +1374,9 @@ bininstall: altbininstall
+- 	-rm -f $(DESTDIR)$(BINDIR)/idle3
+- 	(cd $(DESTDIR)$(BINDIR); $(LN) -s idle$(VERSION) idle3)
+- 	-rm -f $(DESTDIR)$(BINDIR)/pydoc3
+-+ifeq (@PYDOC@,yes)
+- 	(cd $(DESTDIR)$(BINDIR); $(LN) -s pydoc$(VERSION) pydoc3)
+-+endif
+- 	-rm -f $(DESTDIR)$(BINDIR)/2to3
+- 	(cd $(DESTDIR)$(BINDIR); $(LN) -s 2to3-$(VERSION) 2to3)
+- 	if test "x$(LIPO_32BIT_FLAGS)" != "x" ; then \
+-@@ -1424,7 +1426,7 @@ LIBSUBDIRS=	tkinter site-packages \
+- 		multiprocessing multiprocessing/dummy \
+- 		unittest \
+- 		venv venv/scripts venv/scripts/common venv/scripts/posix \
+--		curses pydoc_data \
+-+		curses \
+- 		zoneinfo
+- 
+- TESTSUBDIRS=	tkinter/test tkinter/test/test_tkinter \
+-@@ -1508,6 +1510,10 @@ ifeq (@TEST_MODULES@,yes)
+- LIBSUBDIRS += $(TESTSUBDIRS)
+- endif
+- 
+-+ifeq (@PYDOC@,yes)
+-+LIBSUBDIRS += pydoc_data
+-+endif
+-+
+- libinstall:	build_all $(srcdir)/Modules/xxmodule.c
+- 	@for i in $(SCRIPTDIR) $(LIBDEST); \
+- 	do \
+-diff --git a/configure.ac b/configure.ac
+-index 92e28d02ee..174ed85a7c 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3358,6 +3358,12 @@ if test "$posix_threads" = "yes"; then
+-       AC_CHECK_FUNCS(pthread_getcpuclockid)
+- fi
+- 
+-+AC_SUBST(PYDOC)
+-+
+-+AC_ARG_ENABLE(pydoc,
+-+	AS_HELP_STRING([--disable-pydoc], [disable pydoc]),
+-+	[ PYDOC="${enableval}" ], [ PYDOC=yes ])
+-+
+- AC_SUBST(TEST_MODULES)
+- 
+- AC_ARG_ENABLE(test-modules,
+-diff --git a/setup.py b/setup.py
+-index 926c16f58f..1fc5fac90c 100644
+---- a/setup.py
+-+++ b/setup.py
+-@@ -2565,6 +2565,12 @@ def main():
+-     # turn off warnings when deprecated modules are imported
+-     import warnings
+-     warnings.filterwarnings("ignore",category=DeprecationWarning)
+-+
+-+    scripts = ['Tools/scripts/idle3', 'Tools/scripts/2to3',
+-+               'Lib/smtpd.py']
+-+    if not '--disable-pydoc' in sysconfig.get_config_var("CONFIG_ARGS"):
+-+        scripts += [ 'Tools/scripts/pydoc3' ]
+-+
+-     setup(# PyPI Metadata (PEP 301)
+-           name = "Python",
+-           version = sys.version.split()[0],
+-@@ -2589,8 +2595,7 @@ def main():
+-           # If you change the scripts installed here, you also need to
+-           # check the PyBuildScripts command above, and change the links
+-           # created by the bininstall target in Makefile.pre.in
+--          scripts = ["Tools/scripts/pydoc3", "Tools/scripts/idle3",
+--                     "Tools/scripts/2to3"]
+-+          scripts = scripts
+-         )
+- 
+- # --install-platlib
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0015-Add-an-option-to-disable-lib2to3.patch b/package/python3/0015-Add-an-option-to-disable-lib2to3.patch
+deleted file mode 100644
+index fe94cdfded..0000000000
+--- a/package/python3/0015-Add-an-option-to-disable-lib2to3.patch
++++ /dev/null
+@@ -1,116 +0,0 @@
+-From f034b1b0f33a7bd4dde23f0bc1fa8e00e3518c9d Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:15:31 -0800
+-Subject: [PATCH] Add an option to disable lib2to3
+-
+-lib2to3 is a library to convert Python 2.x code to Python 3.x. As
+-such, it is probably not very useful on embedded system targets.
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+----
+- Makefile.pre.in | 16 ++++++++++++----
+- configure.ac    |  6 ++++++
+- setup.py        |  5 +++--
+- 3 files changed, 21 insertions(+), 6 deletions(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index 63e3df0470..8b7de12999 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1378,7 +1378,9 @@ ifeq (@PYDOC@,yes)
+- 	(cd $(DESTDIR)$(BINDIR); $(LN) -s pydoc$(VERSION) pydoc3)
+- endif
+- 	-rm -f $(DESTDIR)$(BINDIR)/2to3
+-+ifeq (@LIB2TO3@,yes)
+- 	(cd $(DESTDIR)$(BINDIR); $(LN) -s 2to3-$(VERSION) 2to3)
+-+endif
+- 	if test "x$(LIPO_32BIT_FLAGS)" != "x" ; then \
+- 		rm -f $(DESTDIR)$(BINDIR)/python3-32$(EXE); \
+- 		(cd $(DESTDIR)$(BINDIR); $(LN) -s python$(VERSION)-32$(EXE) python3-32$(EXE)) \
+-@@ -1417,7 +1419,6 @@ LIBSUBDIRS=	tkinter site-packages \
+- 		html json http dbm xmlrpc \
+- 		sqlite3 \
+- 		logging csv wsgiref urllib \
+--		lib2to3 lib2to3/fixes lib2to3/pgen2 \
+- 		ctypes ctypes/macholib \
+- 		idlelib idlelib/Icons \
+- 		distutils distutils/command $(XMLLIBSUBDIRS) \
+-@@ -1495,9 +1496,6 @@ TESTSUBDIRS=	tkinter/test tkinter/test/test_tkinter \
+- 		test/test_email test/test_email/data \
+- 		test/test_json \
+- 		sqlite3/test \
+--		lib2to3/tests \
+--		lib2to3/tests/data lib2to3/tests/data/fixers \
+--		lib2to3/tests/data/fixers/myfixes \
+- 		ctypes/test \
+- 		idlelib/idle_test \
+- 		distutils/tests \
+-@@ -1506,6 +1504,14 @@ TESTSUBDIRS=	tkinter/test tkinter/test/test_tkinter \
+- 		test/test_tools test/test_warnings test/test_warnings/data \
+- 		unittest/test unittest/test/testmock
+- 
+-+ifeq (@LIB2TO3@,yes)
+-+LIBSUBDIRS += lib2to3 lib2to3/fixes lib2to3/pgen2
+-+TESTSUBDIRS += lib2to3/tests			\
+-+	lib2to3/tests/data			\
+-+	lib2to3/tests/data/fixers		\
+-+	lib2to3/tests/data/fixers/myfixes
+-+endif
+-+
+- ifeq (@TEST_MODULES@,yes)
+- LIBSUBDIRS += $(TESTSUBDIRS)
+- endif
+-@@ -1606,10 +1612,12 @@ ifeq (@PYC_BUILD@,yes)
+- 		-j0 -d $(LIBDEST)/site-packages -f \
+- 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
+- endif
+-+ifeq (@LIB2TO3@,yes)
+- 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+- 		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/Grammar.txt
+- 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+- 		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/PatternGrammar.txt
+-+endif
+- 
+- # bpo-21536: Misc/python-config.sh is generated in the build directory
+- # from $(srcdir)Misc/python-config.sh.in.
+-diff --git a/configure.ac b/configure.ac
+-index 174ed85a7c..f1f5e9a7b0 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3370,6 +3370,12 @@ AC_ARG_ENABLE(test-modules,
+- 	AS_HELP_STRING([--disable-test-modules], [disable test modules]),
+- 	[ TEST_MODULES="${enableval}" ], [ TEST_MODULES=yes ])
+- 
+-+AC_SUBST(LIB2TO3)
+-+
+-+AC_ARG_ENABLE(lib2to3,
+-+	AS_HELP_STRING([--disable-lib2to3], [disable lib2to3]),
+-+	[ LIB2TO3="${enableval}" ], [ LIB2TO3=yes ])
+-+
+- # Check for enable-ipv6
+- AH_TEMPLATE(ENABLE_IPV6, [Define if --enable-ipv6 is specified])
+- AC_MSG_CHECKING([if --enable-ipv6 is specified])
+-diff --git a/setup.py b/setup.py
+-index 1fc5fac90c..4063d7ffa5 100644
+---- a/setup.py
+-+++ b/setup.py
+-@@ -2566,10 +2566,11 @@ def main():
+-     import warnings
+-     warnings.filterwarnings("ignore",category=DeprecationWarning)
+- 
+--    scripts = ['Tools/scripts/idle3', 'Tools/scripts/2to3',
+--               'Lib/smtpd.py']
+-+    scripts = ['Tools/scripts/idle3', 'Lib/smtpd.py']
+-     if not '--disable-pydoc' in sysconfig.get_config_var("CONFIG_ARGS"):
+-         scripts += [ 'Tools/scripts/pydoc3' ]
+-+    if not '--disable-lib2to3' in sysconfig.get_config_var("CONFIG_ARGS"):
+-+        scripts += [ 'Tools/scripts/2to3' ]
+- 
+-     setup(# PyPI Metadata (PEP 301)
+-           name = "Python",
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0016-Add-option-to-disable-the-sqlite3-module.patch b/package/python3/0016-Add-option-to-disable-the-sqlite3-module.patch
+deleted file mode 100644
+index d6c9bccd45..0000000000
+--- a/package/python3/0016-Add-option-to-disable-the-sqlite3-module.patch
++++ /dev/null
+@@ -1,69 +0,0 @@
+-From dd2722dec08eb9c72c36313e93661eeca3ad64d8 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:20:45 -0800
+-Subject: [PATCH] Add option to disable the sqlite3 module
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+----
+- Makefile.pre.in | 7 +++++--
+- configure.ac    | 9 +++++++++
+- 2 files changed, 14 insertions(+), 2 deletions(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index 8b7de12999..d826d8ac4b 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1417,7 +1417,6 @@ LIBSUBDIRS=	tkinter site-packages \
+- 		email email/mime \
+- 		ensurepip ensurepip/_bundled \
+- 		html json http dbm xmlrpc \
+--		sqlite3 \
+- 		logging csv wsgiref urllib \
+- 		ctypes ctypes/macholib \
+- 		idlelib idlelib/Icons \
+-@@ -1495,7 +1494,6 @@ TESTSUBDIRS=	tkinter/test tkinter/test/test_tkinter \
+- 		test/test_asyncio \
+- 		test/test_email test/test_email/data \
+- 		test/test_json \
+--		sqlite3/test \
+- 		ctypes/test \
+- 		idlelib/idle_test \
+- 		distutils/tests \
+-@@ -1512,6 +1510,11 @@ TESTSUBDIRS += lib2to3/tests			\
+- 	lib2to3/tests/data/fixers/myfixes
+- endif
+- 
+-+ifeq (@SQLITE3@,yes)
+-+LIBSUBDIRS += sqlite3
+-+TESTSUBDIRS += sqlite3/test
+-+endif
+-+
+- ifeq (@TEST_MODULES@,yes)
+- LIBSUBDIRS += $(TESTSUBDIRS)
+- endif
+-diff --git a/configure.ac b/configure.ac
+-index f1f5e9a7b0..8b5c65974c 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3358,6 +3358,15 @@ if test "$posix_threads" = "yes"; then
+-       AC_CHECK_FUNCS(pthread_getcpuclockid)
+- fi
+- 
+-+AC_SUBST(SQLITE3)
+-+AC_ARG_ENABLE(sqlite3,
+-+	AS_HELP_STRING([--disable-sqlite3], [disable sqlite3]),
+-+	[ SQLITE3="${enableval}" ], [ SQLITE3=yes ])
+-+
+-+if test "$SQLITE3" = "no" ; then
+-+   DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _sqlite3"
+-+fi
+-+
+- AC_SUBST(PYDOC)
+- 
+- AC_ARG_ENABLE(pydoc,
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0017-Add-an-option-to-disable-the-tk-module.patch b/package/python3/0017-Add-an-option-to-disable-the-tk-module.patch
+deleted file mode 100644
+index b798eb56a5..0000000000
+--- a/package/python3/0017-Add-an-option-to-disable-the-tk-module.patch
++++ /dev/null
+@@ -1,73 +0,0 @@
+-From ad6b66b34f71ff6b60b3be5f6fd3e781cdeecd59 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:23:42 -0800
+-Subject: [PATCH] Add an option to disable the tk module
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+----
+- Makefile.pre.in | 11 ++++++++---
+- configure.ac    |  9 +++++++++
+- 2 files changed, 17 insertions(+), 3 deletions(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index d826d8ac4b..dc84384680 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1411,7 +1411,7 @@ maninstall:	altmaninstall
+- # Install the library
+- XMLLIBSUBDIRS=  xml xml/dom xml/etree xml/parsers xml/sax
+- 
+--LIBSUBDIRS=	tkinter site-packages \
+-+LIBSUBDIRS=	site-packages \
+- 		asyncio \
+- 		collections concurrent concurrent/futures encodings \
+- 		email email/mime \
+-@@ -1429,8 +1429,7 @@ LIBSUBDIRS=	tkinter site-packages \
+- 		curses \
+- 		zoneinfo
+- 
+--TESTSUBDIRS=	tkinter/test tkinter/test/test_tkinter \
+--		tkinter/test/test_ttk test \
+-+TESTSUBDIRS=	test \
+- 		test/audiodata \
+- 		test/capath test/data \
+- 		test/cjkencodings test/decimaltestdata \
+-@@ -1502,6 +1501,12 @@ TESTSUBDIRS=	tkinter/test tkinter/test/test_tkinter \
+- 		test/test_tools test/test_warnings test/test_warnings/data \
+- 		unittest/test unittest/test/testmock
+- 
+-+ifeq (@TK@,yes)
+-+LIBSUBDIRS += tkinter
+-+TESTSUBDIRS += tkinter/test tkinter/test/test_tkinter \
+-+	tkinter/test/test_ttk
+-+endif
+-+
+- ifeq (@LIB2TO3@,yes)
+- LIBSUBDIRS += lib2to3 lib2to3/fixes lib2to3/pgen2
+- TESTSUBDIRS += lib2to3/tests			\
+-diff --git a/configure.ac b/configure.ac
+-index 8b5c65974c..4c72dae960 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3367,6 +3367,15 @@ if test "$SQLITE3" = "no" ; then
+-    DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _sqlite3"
+- fi
+- 
+-+AC_SUBST(TK)
+-+AC_ARG_ENABLE(tk,
+-+	AS_HELP_STRING([--disable-tk], [disable tk]),
+-+	[ TK="${enableval}" ], [ TK=yes ])
+-+
+-+if test "$TK" = "no"; then
+-+   DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _tkinter"
+-+fi
+-+
+- AC_SUBST(PYDOC)
+- 
+- AC_ARG_ENABLE(pydoc,
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0018-Add-an-option-to-disable-the-curses-module.patch b/package/python3/0018-Add-an-option-to-disable-the-curses-module.patch
+deleted file mode 100644
+index 93dfac26ec..0000000000
+--- a/package/python3/0018-Add-an-option-to-disable-the-curses-module.patch
++++ /dev/null
+@@ -1,60 +0,0 @@
+-From 962deb43f5f340a8472d432ae8e6d61186f9040e Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:31:51 -0800
+-Subject: [PATCH] Add an option to disable the curses module
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+----
+- Makefile.pre.in | 5 ++++-
+- configure.ac    | 9 +++++++++
+- 2 files changed, 13 insertions(+), 1 deletion(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index dc84384680..2a82f3308f 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1426,7 +1426,6 @@ LIBSUBDIRS=	site-packages \
+- 		multiprocessing multiprocessing/dummy \
+- 		unittest \
+- 		venv venv/scripts venv/scripts/common venv/scripts/posix \
+--		curses \
+- 		zoneinfo
+- 
+- TESTSUBDIRS=	test \
+-@@ -1507,6 +1506,10 @@ TESTSUBDIRS += tkinter/test tkinter/test/test_tkinter \
+- 	tkinter/test/test_ttk
+- endif
+- 
+-+ifeq (@CURSES@,yes)
+-+LIBSUBDIRS += curses
+-+endif
+-+
+- ifeq (@LIB2TO3@,yes)
+- LIBSUBDIRS += lib2to3 lib2to3/fixes lib2to3/pgen2
+- TESTSUBDIRS += lib2to3/tests			\
+-diff --git a/configure.ac b/configure.ac
+-index 4c72dae960..acd98381a3 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3376,6 +3376,15 @@ if test "$TK" = "no"; then
+-    DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _tkinter"
+- fi
+- 
+-+AC_SUBST(CURSES)
+-+AC_ARG_ENABLE(curses,
+-+	AS_HELP_STRING([--disable-curses], [disable curses]),
+-+	[ CURSES="${enableval}" ], [ CURSES=yes ])
+-+
+-+if test "$CURSES" = "no"; then
+-+   DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _curses _curses_panel"
+-+fi
+-+
+- AC_SUBST(PYDOC)
+- 
+- AC_ARG_ENABLE(pydoc,
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0019-Add-an-option-to-disable-expat.patch b/package/python3/0019-Add-an-option-to-disable-expat.patch
+deleted file mode 100644
+index e7349058c8..0000000000
+--- a/package/python3/0019-Add-an-option-to-disable-expat.patch
++++ /dev/null
+@@ -1,92 +0,0 @@
+-From 7e0e7dc25f50acd6922493ae620ee5cbf107a79a Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:40:45 -0800
+-Subject: [PATCH] Add an option to disable expat
+-
+-This patch replaces the existing --with-system-expat option with a
+---with-expat={system,builtin,none} option, which allows to tell Python
+-whether we want to use the system expat (already installed), the expat
+-builtin the Python sources, or no expat at all (which disables the
+-installation of XML modules).
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+----
+- Makefile.pre.in |  6 +++++-
+- configure.ac    | 18 +++++++++++++-----
+- setup.py        |  2 +-
+- 3 files changed, 19 insertions(+), 7 deletions(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index 2a82f3308f..e678c8817e 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1420,7 +1420,7 @@ LIBSUBDIRS=	site-packages \
+- 		logging csv wsgiref urllib \
+- 		ctypes ctypes/macholib \
+- 		idlelib idlelib/Icons \
+--		distutils distutils/command $(XMLLIBSUBDIRS) \
+-+		distutils distutils/command \
+- 		importlib \
+- 		turtledemo \
+- 		multiprocessing multiprocessing/dummy \
+-@@ -1510,6 +1510,10 @@ ifeq (@CURSES@,yes)
+- LIBSUBDIRS += curses
+- endif
+- 
+-+ifeq (@EXPAT@,yes)
+-+LIBSUBDIRS += $(XMLLIBSUBDIRS)
+-+endif
+-+
+- ifeq (@LIB2TO3@,yes)
+- LIBSUBDIRS += lib2to3 lib2to3/fixes lib2to3/pgen2
+- TESTSUBDIRS += lib2to3/tests			\
+-diff --git a/configure.ac b/configure.ac
+-index acd98381a3..9ef0ecd42f 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3084,13 +3084,21 @@ PKG_PROG_PKG_CONFIG
+- AC_SUBST(DISABLED_EXTENSIONS)
+- 
+- # Check for use of the system expat library
+--AC_MSG_CHECKING(for --with-system-expat)
+--AC_ARG_WITH(system_expat,
+--            AS_HELP_STRING([--with-system-expat], [build pyexpat module using an installed expat library, see Doc/library/pyexpat.rst (default is no)]),
+-+AC_MSG_CHECKING(for --with-expat)
+-+AC_ARG_WITH(expat,
+-+            AS_HELP_STRING([--with-expat], [select which expat version to use: system, builtin, none]),
+-             [],
+--            [with_system_expat="no"])
+-+            [with_expat="builtin"])
+- 
+--AC_MSG_RESULT($with_system_expat)
+-+AC_MSG_RESULT($with_expat)
+-+
+-+if test "$with_expat" != "none"; then
+-+   EXPAT=yes
+-+else
+-+   DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} pyexpat"
+-+   EXPAT=no
+-+fi
+-+AC_SUBST(EXPAT)
+- 
+- # Check for use of the system libffi library
+- AC_MSG_CHECKING(for --with-system-ffi)
+-diff --git a/setup.py b/setup.py
+-index 4063d7ffa5..211a160f29 100644
+---- a/setup.py
+-+++ b/setup.py
+-@@ -1666,7 +1666,7 @@ class PyBuildExt(build_ext):
+-         #
+-         # More information on Expat can be found at www.libexpat.org.
+-         #
+--        if '--with-system-expat' in sysconfig.get_config_var("CONFIG_ARGS"):
+-+        if '--with-expat=system' in sysconfig.get_config_var("CONFIG_ARGS"):
+-             expat_inc = []
+-             define_macros = []
+-             extra_compile_args = []
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0020-Add-an-option-to-disable-CJK-codecs.patch b/package/python3/0020-Add-an-option-to-disable-CJK-codecs.patch
+deleted file mode 100644
+index 4e22543096..0000000000
+--- a/package/python3/0020-Add-an-option-to-disable-CJK-codecs.patch
++++ /dev/null
+@@ -1,30 +0,0 @@
+-From 2c0d31bb91fc7f94283c3ab632925fbbe24e94d6 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 23 Dec 2015 11:49:55 +0100
+-Subject: [PATCH] Add an option to disable CJK codecs
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+----
+- configure.ac | 6 ++++++
+- 1 file changed, 6 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 9ef0ecd42f..18e6fd70a0 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3375,6 +3375,12 @@ if test "$SQLITE3" = "no" ; then
+-    DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _sqlite3"
+- fi
+- 
+-+AC_ARG_ENABLE(codecs-cjk,
+-+	AS_HELP_STRING([--disable-codecs-cjk], [disable CJK codecs]),
+-+	[ if test "$enableval" = "no"; then
+-+		DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _codecs_kr _codecs_jp _codecs_cn _codecs_tw _codecs_hk _codecs_iso2022"
+-+	fi])
+-+
+- AC_SUBST(TK)
+- AC_ARG_ENABLE(tk,
+- 	AS_HELP_STRING([--disable-tk], [disable tk]),
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0021-Add-an-option-to-disable-NIS.patch b/package/python3/0021-Add-an-option-to-disable-NIS.patch
+deleted file mode 100644
+index 9cd54df180..0000000000
+--- a/package/python3/0021-Add-an-option-to-disable-NIS.patch
++++ /dev/null
+@@ -1,33 +0,0 @@
+-From 2041d0c8dba87991edaf088b16e37b5189a3466d Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 23 Dec 2015 11:50:11 +0100
+-Subject: [PATCH] Add an option to disable NIS
+-
+-NIS is not necessarily available in uClibc, so we need an option to
+-not compile support for it.
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+----
+- configure.ac | 6 ++++++
+- 1 file changed, 6 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 18e6fd70a0..46d2a8131e 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3381,6 +3381,12 @@ AC_ARG_ENABLE(codecs-cjk,
+- 		DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _codecs_kr _codecs_jp _codecs_cn _codecs_tw _codecs_hk _codecs_iso2022"
+- 	fi])
+- 
+-+AC_ARG_ENABLE(nis,
+-+	AS_HELP_STRING([--disable-nis], [disable NIS]),
+-+	[ if test "$enableval" = "no"; then
+-+    	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} nis"
+-+  	  fi])
+-+
+- AC_SUBST(TK)
+- AC_ARG_ENABLE(tk,
+- 	AS_HELP_STRING([--disable-tk], [disable tk]),
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0022-Add-an-option-to-disable-unicodedata.patch b/package/python3/0022-Add-an-option-to-disable-unicodedata.patch
+deleted file mode 100644
+index 2ddf606a70..0000000000
+--- a/package/python3/0022-Add-an-option-to-disable-unicodedata.patch
++++ /dev/null
+@@ -1,30 +0,0 @@
+-From dd82a401ff6ba4ba116bf4d520e981a1808ed443 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 23 Dec 2015 11:50:27 +0100
+-Subject: [PATCH] Add an option to disable unicodedata
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+----
+- configure.ac | 6 ++++++
+- 1 file changed, 6 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 46d2a8131e..5844e3b73f 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3387,6 +3387,12 @@ AC_ARG_ENABLE(nis,
+-     	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} nis"
+-   	  fi])
+- 
+-+AC_ARG_ENABLE(unicodedata,
+-+	AS_HELP_STRING([--disable-unicodedata], [disable unicodedata]),
+-+	[ if test "$enableval" = "no"; then
+-+    	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} unicodedata"
+-+  	  fi])
+-+
+- AC_SUBST(TK)
+- AC_ARG_ENABLE(tk,
+- 	AS_HELP_STRING([--disable-tk], [disable tk]),
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0023-Add-an-option-to-disable-IDLE.patch b/package/python3/0023-Add-an-option-to-disable-IDLE.patch
+deleted file mode 100644
+index 0e35eea699..0000000000
+--- a/package/python3/0023-Add-an-option-to-disable-IDLE.patch
++++ /dev/null
+@@ -1,89 +0,0 @@
+-From f1b15834045d0641c43014b970721df066fa71f7 Mon Sep 17 00:00:00 2001
+-From: Maxime Ripard <maxime.ripard@free-electrons.com>
+-Date: Wed, 22 Feb 2017 17:45:14 -0800
+-Subject: [PATCH] Add an option to disable IDLE
+-
+-IDLE is an IDE embedded into python, written using Tk, so it doesn't make
+-much sense to have it into our build.
+-
+-Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
+-[ Andrey Smirnov: ported to Python 3.6 ]
+-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+----
+- Makefile.pre.in | 7 ++++++-
+- configure.ac    | 6 ++++++
+- setup.py        | 4 +++-
+- 3 files changed, 15 insertions(+), 2 deletions(-)
+-
+-diff --git a/Makefile.pre.in b/Makefile.pre.in
+-index e678c8817e..1148bd8708 100644
+---- a/Makefile.pre.in
+-+++ b/Makefile.pre.in
+-@@ -1372,7 +1372,9 @@ bininstall: altbininstall
+- 	-rm -f $(DESTDIR)$(LIBPC)/python3-embed.pc
+- 	(cd $(DESTDIR)$(LIBPC); $(LN) -s python-$(VERSION)-embed.pc python3-embed.pc)
+- 	-rm -f $(DESTDIR)$(BINDIR)/idle3
+-+ifeq (@IDLE@,yes)
+- 	(cd $(DESTDIR)$(BINDIR); $(LN) -s idle$(VERSION) idle3)
+-+endif
+- 	-rm -f $(DESTDIR)$(BINDIR)/pydoc3
+- ifeq (@PYDOC@,yes)
+- 	(cd $(DESTDIR)$(BINDIR); $(LN) -s pydoc$(VERSION) pydoc3)
+-@@ -1419,7 +1421,6 @@ LIBSUBDIRS=	site-packages \
+- 		html json http dbm xmlrpc \
+- 		logging csv wsgiref urllib \
+- 		ctypes ctypes/macholib \
+--		idlelib idlelib/Icons \
+- 		distutils distutils/command \
+- 		importlib \
+- 		turtledemo \
+-@@ -1514,6 +1515,10 @@ ifeq (@EXPAT@,yes)
+- LIBSUBDIRS += $(XMLLIBSUBDIRS)
+- endif
+- 
+-+ifeq (@IDLE@,yes)
+-+LIBSUBDIRS += idlelib idlelib/Icons
+-+endif
+-+
+- ifeq (@LIB2TO3@,yes)
+- LIBSUBDIRS += lib2to3 lib2to3/fixes lib2to3/pgen2
+- TESTSUBDIRS += lib2to3/tests			\
+-diff --git a/configure.ac b/configure.ac
+-index 5844e3b73f..7bd4623ccd 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3429,6 +3429,12 @@ AC_ARG_ENABLE(lib2to3,
+- 	AS_HELP_STRING([--disable-lib2to3], [disable lib2to3]),
+- 	[ LIB2TO3="${enableval}" ], [ LIB2TO3=yes ])
+- 
+-+AC_SUBST(IDLE)
+-+
+-+AC_ARG_ENABLE(idle3,
+-+	AS_HELP_STRING([--disable-idle3], [disable idle3 IDE]),
+-+	[ IDLE="${enableval}" ], [ IDLE=yes ])
+-+
+- # Check for enable-ipv6
+- AH_TEMPLATE(ENABLE_IPV6, [Define if --enable-ipv6 is specified])
+- AC_MSG_CHECKING([if --enable-ipv6 is specified])
+-diff --git a/setup.py b/setup.py
+-index 211a160f29..c4ee989ba3 100644
+---- a/setup.py
+-+++ b/setup.py
+-@@ -2566,11 +2566,13 @@ def main():
+-     import warnings
+-     warnings.filterwarnings("ignore",category=DeprecationWarning)
+- 
+--    scripts = ['Tools/scripts/idle3', 'Lib/smtpd.py']
+-+    scripts = [ 'Lib/smtpd.py']
+-     if not '--disable-pydoc' in sysconfig.get_config_var("CONFIG_ARGS"):
+-         scripts += [ 'Tools/scripts/pydoc3' ]
+-     if not '--disable-lib2to3' in sysconfig.get_config_var("CONFIG_ARGS"):
+-         scripts += [ 'Tools/scripts/2to3' ]
+-+    if not '--disable-idle3' in sysconfig.get_config_var("CONFIG_ARGS"):
+-+        scripts += [ 'Tools/scripts/idle3' ]
+- 
+-     setup(# PyPI Metadata (PEP 301)
+-           name = "Python",
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0024-Add-an-option-to-disable-decimal.patch b/package/python3/0024-Add-an-option-to-disable-decimal.patch
+deleted file mode 100644
+index b5a12f7f38..0000000000
+--- a/package/python3/0024-Add-an-option-to-disable-decimal.patch
++++ /dev/null
+@@ -1,66 +0,0 @@
+-From d5fe81cbd51da2a84ed89d1e4c80d921d4efce26 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 23 Dec 2015 11:51:31 +0100
+-Subject: [PATCH] Add an option to disable decimal
+-
+-This patch replaces the existing --with-system-libmpdec option with a
+---with-libmpdec={system,builtin,none} option, which allows to tell
+-Python whether we want to use the system libmpdec (already installed),
+-the libmpdec builtin the Python sources, or no libmpdec at all.
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-[aduskett@gmail.com: Update for python 3.7.0]
+-Signed-off-by: Adam Duskett <aduskett@gmail.com>
+-[james.hilliard1@gmail.com: adapt to python 3.9]
+-Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
+----
+- configure.ac | 17 ++++++++++++-----
+- setup.py     |  2 +-
+- 2 files changed, 13 insertions(+), 6 deletions(-)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 7bd4623ccd..e513ef6a20 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3135,13 +3135,20 @@ fi
+- AC_SUBST(LIBFFI_INCLUDEDIR)
+- 
+- # Check for use of the system libmpdec library
+--AC_MSG_CHECKING(for --with-system-libmpdec)
+--AC_ARG_WITH(system_libmpdec,
+--            AS_HELP_STRING([--with-system-libmpdec], [build _decimal module using an installed libmpdec library, see Doc/library/decimal.rst (default is no)]),
+-+AC_MSG_CHECKING(for --with-libmpdec)
+-+AC_ARG_WITH(libmpdec,
+-+            AS_HELP_STRING([--with-libmpdec], [select which libmpdec version to use: system, builtin, none]),
+-             [],
+--            [with_system_libmpdec="no"])
+-+            [with_libmpdec="builtin"])
+- 
+--AC_MSG_RESULT($with_system_libmpdec)
+-+AC_MSG_RESULT($with_libmpdec)
+-+if test "$with_libmpdec" != "none"; then
+-+   MPDEC=yes
+-+else
+-+   DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _decimal"
+-+   MPDEC=no
+-+fi
+-+AC_SUBST(MPDEC)
+- 
+- # Check whether _decimal should use a coroutine-local or thread-local context
+- AC_MSG_CHECKING(for --with-decimal-contextvar)
+-diff --git a/setup.py b/setup.py
+-index c4ee989ba3..3d0c74bb7f 100644
+---- a/setup.py
+-+++ b/setup.py
+-@@ -2195,7 +2195,7 @@ class PyBuildExt(build_ext):
+-         # Stefan Krah's _decimal module
+-         extra_compile_args = []
+-         undef_macros = []
+--        if '--with-system-libmpdec' in sysconfig.get_config_var("CONFIG_ARGS"):
+-+        if '--with-libmpdec=system' in sysconfig.get_config_var("CONFIG_ARGS"):
+-             include_dirs = []
+-             libraries = [':libmpdec.so.2']
+-             sources = ['_decimal/_decimal.c']
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0025-Add-an-option-to-disable-the-ossaudiodev-module.patch b/package/python3/0025-Add-an-option-to-disable-the-ossaudiodev-module.patch
+deleted file mode 100644
+index 0f68a08356..0000000000
+--- a/package/python3/0025-Add-an-option-to-disable-the-ossaudiodev-module.patch
++++ /dev/null
+@@ -1,30 +0,0 @@
+-From 9bedc56d2a4b8856162650a11c1fcb6ec38f160b Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Wed, 23 Dec 2015 11:51:58 +0100
+-Subject: [PATCH] Add an option to disable the ossaudiodev module
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+----
+- configure.ac | 6 ++++++
+- 1 file changed, 6 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index e513ef6a20..c07505e89e 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3165,6 +3165,12 @@ fi
+- 
+- AC_MSG_RESULT($with_decimal_contextvar)
+- 
+-+AC_ARG_ENABLE(ossaudiodev,
+-+	AS_HELP_STRING([--disable-ossaudiodev], [disable OSSAUDIODEV]),
+-+	[ if test "$enableval" = "no"; then
+-+	  DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} ossaudiodev"
+-+	  fi])
+-+
+- # Check for support for loadable sqlite extensions
+- AC_MSG_CHECKING(for --enable-loadable-sqlite-extensions)
+- AC_ARG_ENABLE(loadable-sqlite-extensions,
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0026-Add-an-option-to-disable-openssl-support.patch b/package/python3/0026-Add-an-option-to-disable-openssl-support.patch
+deleted file mode 100644
+index 44d1d3d6b3..0000000000
+--- a/package/python3/0026-Add-an-option-to-disable-openssl-support.patch
++++ /dev/null
+@@ -1,30 +0,0 @@
+-From 90ed5c692b8b5596ca0b3ae1436276c8181251d8 Mon Sep 17 00:00:00 2001
+-From: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+-Date: Wed, 22 Feb 2017 17:55:59 -0800
+-Subject: [PATCH] Add an option to disable openssl support.
+-
+-Signed-off-by: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+----
+- configure.ac | 6 ++++++
+- 1 file changed, 6 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index c07505e89e..612e32faf5 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3406,6 +3406,12 @@ AC_ARG_ENABLE(unicodedata,
+-     	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} unicodedata"
+-   	  fi])
+- 
+-+AC_ARG_ENABLE(openssl,
+-+	AS_HELP_STRING([--disable-openssl], [disable openssl support]),
+-+	[ if test "$enableval" = "no"; then
+-+	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} ssl _ssl _hashlib"
+-+	  fi])
+-+
+- AC_SUBST(TK)
+- AC_ARG_ENABLE(tk,
+- 	AS_HELP_STRING([--disable-tk], [disable tk]),
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0027-Add-an-option-to-disable-the-readline-module.patch b/package/python3/0027-Add-an-option-to-disable-the-readline-module.patch
+deleted file mode 100644
+index 1597a2a560..0000000000
+--- a/package/python3/0027-Add-an-option-to-disable-the-readline-module.patch
++++ /dev/null
+@@ -1,30 +0,0 @@
+-From 049e7a51e1ffd0d28d6608c707ab4b54e816d338 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Tue, 7 Mar 2017 23:29:05 +0100
+-Subject: [PATCH] Add an option to disable the readline module
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+----
+- configure.ac | 6 ++++++
+- 1 file changed, 6 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 612e32faf5..2a6aaeff60 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3412,6 +3412,12 @@ AC_ARG_ENABLE(openssl,
+- 	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} ssl _ssl _hashlib"
+- 	  fi])
+- 
+-+AC_ARG_ENABLE(readline,
+-+	AS_HELP_STRING([--disable-readline], [disable readline]),
+-+	[ if test "$enableval" = "no"; then
+-+	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} readline"
+-+	  fi])
+-+
+- AC_SUBST(TK)
+- AC_ARG_ENABLE(tk,
+- 	AS_HELP_STRING([--disable-tk], [disable tk]),
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0029-python-config.sh-don-t-reassign-prefix.patch b/package/python3/0027-python-config.sh-don-t-reassign-prefix.patch
+old mode 100644
+new mode 100755
+similarity index 97%
+rename from package/python3/0029-python-config.sh-don-t-reassign-prefix.patch
+rename to package/python3/0027-python-config.sh-don-t-reassign-prefix.patch
+index 4478b40162..814a9d42e5
+--- a/package/python3/0029-python-config.sh-don-t-reassign-prefix.patch
++++ b/package/python3/0027-python-config.sh-don-t-reassign-prefix.patch
+@@ -27,7 +27,7 @@ Signed-off-by: Matthew Weber <matthew.weber@rockwellcollins.com>
+  1 file changed, 2 insertions(+), 2 deletions(-)
+ 
+ diff --git a/Misc/python-config.sh.in b/Misc/python-config.sh.in
+-index a1bc3cd5f7..164d2d3603 100644
++index a1bc3cd..164d2d3 100644
+ --- a/Misc/python-config.sh.in
+ +++ b/Misc/python-config.sh.in
+ @@ -31,7 +31,7 @@ prefix_real=$(installed_prefix "$0")
+@@ -49,5 +49,5 @@ index a1bc3cd5f7..164d2d3603 100644
+  SO="@EXT_SUFFIX@"
+  PYTHONFRAMEWORK="@PYTHONFRAMEWORK@"
+ -- 
+-2.25.1
++2.30.2
+ 
+diff --git a/package/python3/0028-Add-options-to-disable-zlib-bzip2-and-xz-modules.patch b/package/python3/0028-Add-options-to-disable-zlib-bzip2-and-xz-modules.patch
+deleted file mode 100644
+index a1d2ef3255..0000000000
+--- a/package/python3/0028-Add-options-to-disable-zlib-bzip2-and-xz-modules.patch
++++ /dev/null
+@@ -1,42 +0,0 @@
+-From 146730a04dfe98e3d7971ebf5410801ceae88e11 Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Tue, 7 Mar 2017 23:31:11 +0100
+-Subject: [PATCH] Add options to disable zlib, bzip2 and xz modules
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+----
+- configure.ac | 18 ++++++++++++++++++
+- 1 file changed, 18 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 2a6aaeff60..21479bbd7d 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3418,6 +3418,24 @@ AC_ARG_ENABLE(readline,
+- 	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} readline"
+- 	  fi])
+- 
+-+AC_ARG_ENABLE(bzip2,
+-+	AS_HELP_STRING([--disable-bzip2], [disable bzip2]),
+-+	[ if test "$enableval" = "no"; then
+-+	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _bz2"
+-+	  fi])
+-+
+-+AC_ARG_ENABLE(zlib,
+-+	AS_HELP_STRING([--disable-zlib], [disable zlib]),
+-+	[ if test "$enableval" = "no"; then
+-+	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} zlib"
+-+	  fi])
+-+
+-+AC_ARG_ENABLE(xz,
+-+	AS_HELP_STRING([--disable-xz], [disable xz]),
+-+	[ if test "$enableval" = "no"; then
+-+	     DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _lzma"
+-+	  fi])
+-+
+- AC_SUBST(TK)
+- AC_ARG_ENABLE(tk,
+- 	AS_HELP_STRING([--disable-tk], [disable tk]),
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0030-Fix-cross-compiling-the-uuid-module.patch b/package/python3/0030-Fix-cross-compiling-the-uuid-module.patch
+deleted file mode 100644
+index 1bf5fc6db4..0000000000
+--- a/package/python3/0030-Fix-cross-compiling-the-uuid-module.patch
++++ /dev/null
+@@ -1,38 +0,0 @@
+-From d7b90b157eddefbd0ed59e35c90b083c0c03b644 Mon Sep 17 00:00:00 2001
+-From: Adam Duskett <aduskett@gmail.com>
+-Date: Fri, 20 Jul 2018 10:17:39 -0400
+-Subject: [PATCH] Fix cross compiling the uuid module
+-
+-Python 3.7 has a new _uuid module, however, the include directory
+-search path for uuid.h is hardcoded to /usr/include/uuid, which should
+-not be used when cross-compiling.
+-
+-To fix this, use the same solution as the one used by the NIS
+-detection: append "uuid" to each of the include directories in
+-"inc_dirs", instead of hardcoding /usr/include/uuid.
+-
+-Signed-off-by: Adam Duskett <aduskett@gmail.com>
+-[Thomas: drop STAGING_DIR based solution, use a solution similar to
+-the one used for the NIS detection.]
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+----
+- setup.py | 3 ++-
+- 1 file changed, 2 insertions(+), 1 deletion(-)
+-
+-diff --git a/setup.py b/setup.py
+-index 3d0c74bb7f..c7be85f352 100644
+---- a/setup.py
+-+++ b/setup.py
+-@@ -1764,7 +1764,8 @@ class PyBuildExt(build_ext):
+- 
+-     def detect_uuid(self):
+-         # Build the _uuid module if possible
+--        uuid_incs = find_file("uuid.h", self.inc_dirs, ["/usr/include/uuid"])
+-+        uuid_incs = find_file("uuid.h", self.inc_dirs,
+-+                              [os.path.join(inc_dir, 'uuid') for inc_dir in self.inc_dirs])
+-         if uuid_incs is not None:
+-             if self.compiler.find_library_file(self.lib_dirs, 'uuid'):
+-                 uuid_libs = ['uuid']
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0032-fix-building-on-older-distributions.patch b/package/python3/0030-fix-building-on-older-distributions.patch
+old mode 100644
+new mode 100755
+similarity index 100%
+rename from package/python3/0032-fix-building-on-older-distributions.patch
+rename to package/python3/0030-fix-building-on-older-distributions.patch
+diff --git a/package/python3/0031-Add-an-option-to-disable-uuid-module.patch b/package/python3/0031-Add-an-option-to-disable-uuid-module.patch
+deleted file mode 100644
+index 92b24b211d..0000000000
+--- a/package/python3/0031-Add-an-option-to-disable-uuid-module.patch
++++ /dev/null
+@@ -1,33 +0,0 @@
+-From 3bb693408eda77dda145ec5fecee56ea73031e9f Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+-Date: Sat, 18 Aug 2018 10:54:56 +0200
+-Subject: [PATCH] Add an option to disable uuid module
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+----
+- configure.ac | 9 +++++++++
+- 1 file changed, 9 insertions(+)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 21479bbd7d..615c16aced 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -3454,6 +3454,15 @@ if test "$CURSES" = "no"; then
+-    DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _curses _curses_panel"
+- fi
+- 
+-+AC_SUBST(UUID)
+-+AC_ARG_ENABLE(uuid,
+-+	AS_HELP_STRING([--disable-uuid], [disable uuid]),
+-+	[ UUID="${enableval}" ], [ UUID=yes ])
+-+
+-+if test "$UUID" = "no"; then
+-+   DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS} _uuid"
+-+fi
+-+
+- AC_SUBST(PYDOC)
+- 
+- AC_ARG_ENABLE(pydoc,
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0033-configure.ac-fixup-CC-print-multiarch-output-for-mus.patch b/package/python3/0033-configure.ac-fixup-CC-print-multiarch-output-for-mus.patch
+deleted file mode 100644
+index f70990b254..0000000000
+--- a/package/python3/0033-configure.ac-fixup-CC-print-multiarch-output-for-mus.patch
++++ /dev/null
+@@ -1,48 +0,0 @@
+-From edc0757c56090364e0a95aabfa9f645a16a27569 Mon Sep 17 00:00:00 2001
+-From: Peter Korsgaard <peter@korsgaard.com>
+-Date: Fri, 2 Aug 2019 15:53:16 +0200
+-Subject: [PATCH] configure.ac: fixup $CC --print-multiarch output for
+- musl/uclibc GCC 8+ toolchains
+-
+-GCC commit 6834b83784dcf0364eb820e8 (multiarch support for non-glibc linux
+-systems), which is part of GCC 8+, changed the multiarch logic to use
+-$arch-linux-musl / $arch-linux-uclibc rather than $arch-linux-gnu.
+-
+-This then causes the python3 configure script to error out:
+-
+-checking for the platform triplet based on compiler characteristics... powerpc-linux-gnu
+-configure: error: internal configure error for the platform triplet, please file a bug report
+-
+-http://autobuild.buildroot.net/results/cb4/cb49c539501342e45cbe5ade82e588fcdf51f05b
+-
+-As it requires that the --print-multiarch output (if not empty) matches the
+-deduced triplet (which always uses -linux-gnu).
+-
+-It isn't quite clear why --print-multiarch returns something for a
+-non-multiarch toolchain on some architectures (E.G.  PowerPC), but as a
+-workaround, rewrite the --print-multiarch output to match older GCC versions
+-to keep the configure script happy.
+-
+-Signed-off-by: Peter Korsgaard <peter@korsgaard.com>
+----
+- configure.ac | 4 +++-
+- 1 file changed, 3 insertions(+), 1 deletion(-)
+-
+-diff --git a/configure.ac b/configure.ac
+-index 615c16aced..241298e6cf 100644
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -727,7 +727,9 @@ then
+- fi
+- 
+- 
+--MULTIARCH=$($CC --print-multiarch 2>/dev/null)
+-+# GCC 8+ returns $arch-linux-{musl,uclibc} for musl/uClibc based
+-+# toolchains confusing python. Fix that up
+-+MULTIARCH=$($CC --print-multiarch 2>/dev/null | sed -E 's/-linux-(musl|uclibc)*$/-linux-gnu/')
+- AC_SUBST(MULTIARCH)
+- 
+- AC_MSG_CHECKING([for the platform triplet based on compiler characteristics])
+--- 
+-2.25.1
+-
+diff --git a/package/python3/0034-lib-crypt-uClibc-ng-doesn-t-set-errno-when-encryptio.patch b/package/python3/0033-lib-crypt-uClibc-ng-doesn-t-set-errno-when-encryptio.patch
+old mode 100644
+new mode 100755
+similarity index 100%
+rename from package/python3/0034-lib-crypt-uClibc-ng-doesn-t-set-errno-when-encryptio.patch
+rename to package/python3/0033-lib-crypt-uClibc-ng-doesn-t-set-errno-when-encryptio.patch
+diff --git a/package/python3/0036-Fix-dictionary-iteration-error-in-_ExecutorManagerTh.patch b/package/python3/0036-Fix-dictionary-iteration-error-in-_ExecutorManagerTh.patch
+deleted file mode 100644
+index fbe44c7753..0000000000
+--- a/package/python3/0036-Fix-dictionary-iteration-error-in-_ExecutorManagerTh.patch
++++ /dev/null
+@@ -1,29 +0,0 @@
+-From 331966be70c371b268a4fcce9e97280cd869f137 Mon Sep 17 00:00:00 2001
+-From: Jakub Kulik <kulikjak@gmail.com>
+-Date: Mon, 15 Mar 2021 08:49:28 +0100
+-Subject: [PATCH] Fix dictionary iteration error in _ExecutorManagerThread
+-
+-[Thomas: Taken from upstream pull request
+-https://github.com/python/cpython/pull/24868, which is aimed at fixing
+-https://bugs.python.org/issue43498]
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+----
+- Lib/concurrent/futures/process.py | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/Lib/concurrent/futures/process.py b/Lib/concurrent/futures/process.py
+-index 90bc98bf2ec..e3b36dff572 100644
+---- a/Lib/concurrent/futures/process.py
+-+++ b/Lib/concurrent/futures/process.py
+-@@ -373,7 +373,7 @@ class _ExecutorManagerThread(threading.Thread):
+-         assert not self.thread_wakeup._closed
+-         wakeup_reader = self.thread_wakeup._reader
+-         readers = [result_reader, wakeup_reader]
+--        worker_sentinels = [p.sentinel for p in self.processes.values()]
+-+        worker_sentinels = [p.sentinel for p in self.processes.copy().values()]
+-         ready = mp.connection.wait(readers + worker_sentinels)
+- 
+-         cause = None
+--- 
+-2.31.1
+-
+diff --git a/package/python3/Config.in b/package/python3/Config.in
+index 3a9dd4b2f4..761c38c850 100644
+--- a/package/python3/Config.in
++++ b/package/python3/Config.in
+@@ -4,7 +4,6 @@ comment "python3 needs a toolchain w/ wchar, threads, dynamic library"
+ 
+ config BR2_PACKAGE_PYTHON3
+ 	bool "python3"
+-	depends on !BR2_PACKAGE_PYTHON
+ 	depends on BR2_USE_WCHAR
+ 	# uses fork()
+ 	depends on BR2_USE_MMU
+@@ -46,6 +45,12 @@ config BR2_PACKAGE_PYTHON3_2TO3
+ 	help
+ 	  code translation from python 2 to 3
+ 
++config BR2_PACKAGE_PYTHON3_BERKELEYDB
++	bool "berkeleydb"
++	select BR2_PACKAGE_BERKELEYDB
++	help
++	  berkeleydb module for Python3
++
+ config BR2_PACKAGE_PYTHON3_BZIP2
+ 	bool "bz2 module"
+ 	select BR2_PACKAGE_BZIP2
+@@ -84,6 +89,8 @@ config BR2_PACKAGE_PYTHON3_READLINE
+ config BR2_PACKAGE_PYTHON3_SSL
+ 	bool "ssl"
+ 	select BR2_PACKAGE_OPENSSL
++	select BR2_PACKAGE_OPENSSL_FORCE_LIBOPENSSL
++	select BR2_PACKAGE_LIBOPENSSL_ENABLE_BLAKE2
+ 	help
+ 	  _ssl module for Python3 (required for https in urllib etc).
+ 
+diff --git a/package/python3/Config.in.host b/package/python3/Config.in.host
+index 70b5dacdde..77d608bdc0 100644
+--- a/package/python3/Config.in.host
++++ b/package/python3/Config.in.host
+@@ -7,6 +7,11 @@ config BR2_PACKAGE_HOST_PYTHON3
+ 
+ if BR2_PACKAGE_HOST_PYTHON3
+ 
++config BR2_PACKAGE_HOST_PYTHON3_BZIP2
++	bool "bzip2"
++	help
++	  bz2 module for host Python3.
++
+ config BR2_PACKAGE_HOST_PYTHON3_SSL
+ 	bool "ssl"
+ 	select BR2_PACKAGE_HOST_OPENSSL
+diff --git a/package/python3/python3.hash b/package/python3/python3.hash
+index 444dbd982a..8052e3f6e0 100644
+--- a/package/python3/python3.hash
++++ b/package/python3/python3.hash
+@@ -1,5 +1,3 @@
+-# From https://www.python.org/downloads/release/python-397/
+-md5  fddb060b483bc01850a3f412eea1d954  Python-3.9.7.tar.xz
+ # Locally computed
+-sha256  f8145616e68c00041d1a6399b76387390388f8359581abc24432bb969b5e3c57  Python-3.9.7.tar.xz
+-sha256  599826df92bfdcd2702eac691072498bb096c55af04ee984cf90f70ed77b5a70  LICENSE
++sha256  8437efd5b106ef0a75aabfbf23d880625120a73a86a22ade4d2e2e68d7b74486  Python-3.10.5.tar.xz
++sha256  f03e17cd594c2085f66a454e695c7ebe5b4d3c0eff534f4f194abc2fd164621b  LICENSE
+diff --git a/package/python3/python3.mk b/package/python3/python3.mk
+index 0fab0dd9ba..40711dc99c 100644
+--- a/package/python3/python3.mk
++++ b/package/python3/python3.mk
+@@ -4,8 +4,8 @@
+ #
+ ################################################################################
+ 
+-PYTHON3_VERSION_MAJOR = 3.9
+-PYTHON3_VERSION = $(PYTHON3_VERSION_MAJOR).7
++PYTHON3_VERSION_MAJOR = 3.10
++PYTHON3_VERSION = $(PYTHON3_VERSION_MAJOR).5
+ PYTHON3_SOURCE = Python-$(PYTHON3_VERSION).tar.xz
+ PYTHON3_SITE = https://python.org/ftp/python/$(PYTHON3_VERSION)
+ PYTHON3_LICENSE = Python-2.0, others
+@@ -43,6 +43,12 @@ PYTHON3_DEPENDENCIES = host-python3 libffi
+ 
+ HOST_PYTHON3_DEPENDENCIES = host-autoconf-archive host-expat host-zlib host-libffi
+ 
++ifeq ($(BR2_PACKAGE_HOST_PYTHON3_BZIP2),y)
++HOST_PYTHON3_DEPENDENCIES += host-bzip2
++else
++HOST_PYTHON3_CONF_OPTS += --disable-bzip2
++endif
++
+ ifeq ($(BR2_PACKAGE_HOST_PYTHON3_SSL),y)
+ HOST_PYTHON3_DEPENDENCIES += host-openssl
+ else
+@@ -57,6 +63,12 @@ else
+ PYTHON3_CONF_OPTS += --disable-lib2to3
+ endif
+ 
++ifeq ($(BR2_PACKAGE_PYTHON3_BERKELEYDB),y)
++PYTHON3_DEPENDENCIES += berkeleydb
++else
++PYTHON3_CONF_OPTS += --disable-berkeleydb
++endif
++
+ ifeq ($(BR2_PACKAGE_PYTHON3_READLINE),y)
+ PYTHON3_DEPENDENCIES += readline
+ else
+@@ -91,6 +103,7 @@ endif
+ 
+ ifeq ($(BR2_PACKAGE_PYTHON3_SSL),y)
+ PYTHON3_DEPENDENCIES += openssl
++PYTHON3_CONF_OPTS += --with-openssl=$(STAGING_DIR)/usr
+ else
+ PYTHON3_CONF_OPTS += --disable-openssl
+ endif
+@@ -248,22 +261,14 @@ define PYTHON3_INSTALL_SYMLINK
+ 	ln -fs python3 $(TARGET_DIR)/usr/bin/python
+ endef
+ 
+-ifneq ($(BR2_PACKAGE_PYTHON),y)
+ PYTHON3_POST_INSTALL_TARGET_HOOKS += PYTHON3_INSTALL_SYMLINK
+-endif
+ 
+-# Some packages may have build scripts requiring python3, whatever is the
+-# python version chosen for the target.
+-# Only install the python symlink in the host tree if python3 is enabled
+-# for the target.
+-ifeq ($(BR2_PACKAGE_PYTHON3),y)
+ define HOST_PYTHON3_INSTALL_SYMLINK
+ 	ln -fs python3 $(HOST_DIR)/bin/python
+ 	ln -fs python3-config $(HOST_DIR)/bin/python-config
+ endef
+ 
+ HOST_PYTHON3_POST_INSTALL_HOOKS += HOST_PYTHON3_INSTALL_SYMLINK
+-endif
+ 
+ # Provided to other packages
+ PYTHON3_PATH = $(STAGING_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/
+diff --git a/package/retrogram-plutosdr/Config.in b/package/retrogram-plutosdr/Config.in
+new file mode 100755
+index 0000000000..af70e3d3d1
+--- /dev/null
++++ b/package/retrogram-plutosdr/Config.in
+@@ -0,0 +1,7 @@
++config BR2_PACKAGE_RETROGRAM
++        bool "retrogram-plutosdr"
++        help
++          This is a comment that explains what retrogram is.
++
++          https://github.com/r4d10n/retrogram-plutosdr
++
+diff --git a/package/retrogram-plutosdr/retrogram-plutosdr.mk b/package/retrogram-plutosdr/retrogram-plutosdr.mk
+new file mode 100755
+index 0000000000..85029e712c
+--- /dev/null
++++ b/package/retrogram-plutosdr/retrogram-plutosdr.mk
+@@ -0,0 +1,16 @@
++################################################################################
++#
++# retrogram-plutosdr
++#
++################################################################################
++
++RETROGRAM_VERSION = b677a6440441114b8fc38365ccfdb28e87640916
++#RETROGRAM_SOURCE = retrogram-plutosdr.git
++RETROGRAM_SITE = https://github.com/r4d10n/retrogram-plutosdr
++RETROGRAM_SITE_METHOD = git
++RETROGRAM_INSTALL_STAGING = YES
++RETROGRAM_INSTALL_TARGET = NO
++#RETROGRAM_CONF_OPTS = -DBUILD_DEMOS=ON
++#RETROGRAM_DEPENDENCIES = libglib2 host-pkgconf
++
++$(eval $(cmake-package))
+diff --git a/package/rtl-433/Config.in b/package/rtl-433/Config.in
+new file mode 100755
+index 0000000000..72e88831db
+--- /dev/null
++++ b/package/rtl-433/Config.in
+@@ -0,0 +1,12 @@
++config BR2_PACKAGE_RTL_433
++        bool "rtl-433"
++        depends on BR2_TOOLCHAIN_HAS_THREADS
++        depends on BR2_PACKAGE_SOAPYSDR
++        help
++          Program to decode traffic from Devices that are broadcasting on 433.9 MHz like temperature sensors 
++
++          https://github.com/merbanan/rtl_433
++comment "rtl_433 needs a toolchain w/ threads"
++        depends on !BR2_TOOLCHAIN_HAS_THREADS
++comment "rtl_433 needs soapysdr"
++        depends on !BR2_PACKAGE_SOAPYSDR
+\ No newline at end of file
+diff --git a/package/rtl-433/rtl_433.mk b/package/rtl-433/rtl_433.mk
+new file mode 100755
+index 0000000000..ff77a46144
+--- /dev/null
++++ b/package/rtl-433/rtl_433.mk
+@@ -0,0 +1,18 @@
++################################################################################
++#
++# RTL_433
++#
++################################################################################
++#RTL_433_VERSION := master
++RTL_433_VERSION := 10891fb732e65f3c6962a72ac05dd9656f07638e
++RTL_433_SITE := https://github.com/merbanan/rtl_433.git
++RTL_433_SITE_METHOD := git
++RTL_433_INSTALL_TARGET := YES
++RTL_433_INSTALL_STAGING := YES
++RTL_433_LICENSE := GPL-2.0
++RTL_433_LICENSE_FILES :=  COPYING
++#RTL_433_DEPENDENCIES +=  soapysdr
++RTL_433_CONF_OPTS := -DENABLE_SOAPYSDR=ON -DENABLE_RTLSDR=OFF 
++-DCFLAGS=$(TARGET_CC) -DCXXFLAGS=$(TARGET_CXX)
++
++$(eval $(cmake-package))
+diff --git a/package/rtlsdr-airband/Config.in b/package/rtlsdr-airband/Config.in
+new file mode 100755
+index 0000000000..a3f3d460af
+--- /dev/null
++++ b/package/rtlsdr-airband/Config.in
+@@ -0,0 +1,12 @@
++config BR2_PACKAGE_RTLSDR_AIRBAND
++        bool "rtlsdr-airband"
++        depends on BR2_TOOLCHAIN_HAS_THREADS
++        depends on BR2_PACKAGE_SOAPYSDR
++        help
++          RTLSDR-Airband receives analog radio voice channels and produces audio streams which can be routed to various outputs, such as online streaming services like LiveATC.net.  
++
++          https://github.com/szpajder/RTLSDR-Airband
++comment "RTLSDR_Airband needs a toolchain w/ threads"
++        depends on !BR2_TOOLCHAIN_HAS_THREADS
++comment "RTLSDR_Airband needs soapysdr"
++        depends on !BR2_PACKAGE_SOAPYSDR
+\ No newline at end of file
+diff --git a/package/rtlsdr-airband/rtlsdr-airband.mk b/package/rtlsdr-airband/rtlsdr-airband.mk
+new file mode 100755
+index 0000000000..38138b6dd2
+--- /dev/null
++++ b/package/rtlsdr-airband/rtlsdr-airband.mk
+@@ -0,0 +1,19 @@
++################################################################################
++#
++# RTLSDR_AIRBAND
++#
++################################################################################
++RTLSDR_AIRBAND_VERSION := v4.0.2
++#RTLSDR_AIRBAND_VERSION := 7c80a9fd1e681f9f30e7532be275fca086443227
++RTLSDR_AIRBAND_SITE := https://github.com/szpajder/RTLSDR-Airband
++RTLSDR_AIRBAND_SITE_METHOD := git
++RTLSDR_AIRBAND_INSTALL_TARGET := YES
++RTLSDR_AIRBAND_INSTALL_STAGING := YES
++RTLSDR_AIRBAND_LICENSE := GPL-2.0
++RTLSDR_AIRBAND_DEPENDENCIES += libconfig
++RTLSDR_AIRBAND_CONF_OPTS := -DWITH_SOAPYSDR=1 -DNFM=1 -DPULSE=0 -DWITH_RTLSDR=0
++
++define RTLSDR_AIRBAND_INSTALL_TARGET_CMDS
++	$(INSTALL) -m 0755 -D $(@D)/src/rtl_airband $(TARGET_DIR)/usr/bin/rtl_airband
++endef
++$(eval $(cmake-package))
+diff --git a/package/rxtools/Config.in b/package/rxtools/Config.in
+new file mode 100644
+index 0000000000..57efcc7f79
+--- /dev/null
++++ b/package/rxtools/Config.in
+@@ -0,0 +1,11 @@
++config BR2_PACKAGE_RXTOOLS
++        bool "rxtools"
++        depends on BR2_TOOLCHAIN_HAS_THREADS
++        depends on BR2_PACKAGE_SOAPYSDR
++             help
++          rx_fm, rx_power, and rx_sdr tools for receiving data from SDRs, on rtl_fm, rtl_power, and rtl_sdr from librtlsdr, but using the SoapySDR vneutral SDR support library instead, intended to support a wider range of s than RTL-SDR
++
++          https://github.com/rxseger/rx_tools
++comment "rxtools needs a toolchain w/ threads"
++        depends on !BR2_TOOLCHAIN_HAS_THREADS
++
+diff --git a/package/rxtools/rxtools.mk b/package/rxtools/rxtools.mk
+new file mode 100644
+index 0000000000..59082bc75d
+--- /dev/null
++++ b/package/rxtools/rxtools.mk
+@@ -0,0 +1,24 @@
++################################################################################
++#
++# RXTOOLS
++#
++################################################################################
++
++#RXTOOLS_VERSION = f8f7e4560dd7a8bfaf5e3dfe50685a50ab1e04a9
++RXTOOLS_VERSION = master
++RXTOOLS_SITE = https://github.com/LamaBleu/rx_tools/archive
++#RXTOOLS_SITE = $(call github,LamaBleu,rx_tools,$(RXTOOLS_VERSION))
++#RXTOOLS_SOURCE = rxtools-$(RXTOOLS_VERSION).tar.gz
++RXTOOLS_SOURCE = $(RXTOOLS_VERSION).tar.gz
++#RXTOOLS_VERSION = 571cc9aeccb2004d81032cea484324aacb1a5852
++#RXTOOLS_SITE = https://github.com/rxseger/rx_tools.git
++#oRXTOOLS_SITE_METHOD = git
++
++RXTOOLS_INSTALL_STAGING = YES
++RXTOOLS_LICENSE = GPL-2.0
++RXTOOLS_LICENSE_FILES = COPYING
++RXTOOLS_DEPENDENCIES = soapysdr
++
++
++$(eval $(cmake-package))
++#https://github.com/LamaBleu/rx_tools/archive/refs/heads/master.zip
+diff --git a/package/sigutils/Config.in b/package/sigutils/Config.in
+new file mode 100755
+index 0000000000..c651771d5f
+--- /dev/null
++++ b/package/sigutils/Config.in
+@@ -0,0 +1,13 @@
++config BR2_PACKAGE_SIGUTILS
++        bool "sigutils"
++        depends on BR2_TOOLCHAIN_HAS_THREADS
++        depends on BR2_PACKAGE_FFTW_SINGLE
++#        depends on BR2_PACKAGE_SNDFILE
++        help
++          The sigutils library is a digital signal processing library written in C, designed for blind signal analysis and automatic demodulation in GNU/Linux.
++
++          https://github.com/BatchDrake/sigutils
++comment "sigutils needs a toolchain w/ threads"
++        depends on !BR2_TOOLCHAIN_HAS_THREADS
++comment "sigutils needs fftw3f [fftw_single]"
++        depends on !BR2_PACKAGE_FFTW_SINGLE
+diff --git a/package/sigutils/sigutils.mk b/package/sigutils/sigutils.mk
+new file mode 100755
+index 0000000000..0717864f3f
+--- /dev/null
++++ b/package/sigutils/sigutils.mk
+@@ -0,0 +1,24 @@
++################################################################################
++#
++# SIGUTILS
++#
++################################################################################
++
++
++#SIGUTILS_VERSION =  v0.1.0
++SIGUTILS_VERSION = develop
++SIGUTILS_SITE = https://github.com/BatchDrake/sigutils
++SIGUTILS_SOURCE = sigutils-0.1.0.tar.gz
++#SIGUTILS-$(SIGUTILS_VERSION).tar.gz
++
++#SIGUTILS_VERSION = 571cc9aeccb2004d81032cea484324aacb1a5852
++
++SIGUTILS_SITE_METHOD = git
++
++SIGUTILS_INSTALL_STAGING = YES
++SIGUTILS_LICENSE = GPL-2.0
++#SIGUTILS_LICENSE_FILES =  COPYING
++SIGUTILS_DEPENDENCIES +=  
++
++
++$(eval $(cmake-package))
+diff --git a/package/soapysdr/Config.in b/package/soapysdr/Config.in
+new file mode 100755
+index 0000000000..6a095b7b6c
+--- /dev/null
++++ b/package/soapysdr/Config.in
+@@ -0,0 +1,7 @@
++config BR2_PACKAGE_SOAPYSDR
++        bool "soapysdr"
++        help
++          This is a comment that explains what soapysdr is.
++
++          https://github.com/pothosware/SoapySDR
++
+diff --git a/package/soapysdr/soapysdr.mk b/package/soapysdr/soapysdr.mk
+new file mode 100755
+index 0000000000..cd1c6f8cb5
+--- /dev/null
++++ b/package/soapysdr/soapysdr.mk
+@@ -0,0 +1,28 @@
++################################################################################
++#
++# soapysdr
++#
++################################################################################
++
++#https://github.com/pothosware/SoapySDR/archive/master/SoapySDR-master.zip
++SOAPYSDR_VERSION = 9cbaa3cfb4ad6231a743319d71bda3634885a428
++SOAPYSDR_MASTER_SOURCE_BASENAME = soapysdr
++#SOAPYSDR_MASTER_SOURCE =$(SOAPYSDR_MASTER_SOURCE_BASENAME).zip
++SOAPYSDR_SITE = https://github.com/pothosware/SoapySDR
++SOAPYSDR_SITE_METHOD = git
++SOAPYSDR_INSTALL_STAGING = YES
++SOAPYSDR_INSTALL_TARGET = YES
++SOAPYSDR_LICENSE = Boost Software License 1.0
++SOAPYSDR_LICENSE_FILES = LICENSE_1_0.txt
++#SOAPYSDR_MASTER_DEPENDENCIES = python
++SOAPYSDR_CONF_OPTS = -DENABLE_PYTHON3=OFF -DENABLE_PYTHON=OFF
++# -DCFLAGS=$(TARGET_CC) -DCXXFLAGS=$(TARGET_CXX)
++
++define SOAPYSDR_MASTER_EXTRACT_CMDS
++    echo $(@D)
++    unzip $(DL_DIR)/$(SOAPYSDR_MASTER_VERSION)/$(SOAPYSDR_MASTER_SOURCE_BASENAME).zip -d $(@D)
++    mv $(@D)/$(SOAPYSDR_MASTER_SOURCE_BASENAME)/* $(@D)
++ #   rmdir $(@D)/$(SOAPYSDR_MASTER_SOURCE_BASENAME)
++endef
++
++$(eval $(cmake-package))
+diff --git a/package/suscan/Config.in b/package/suscan/Config.in
+new file mode 100755
+index 0000000000..4866d3ca88
+--- /dev/null
++++ b/package/suscan/Config.in
+@@ -0,0 +1,10 @@
++config BR2_PACKAGE_SUSCAN
++        bool "suscan"
++        depends on BR2_TOOLCHAIN_HAS_THREADS
++#        depends on BR2_PACKAGE_SNDFILE
++        help
++          Suscan is a realtime DSP processing library. It provides a set of useful abstractions to perform dynamic digital signal analysis and demodulation. 
++
++          https://github.com/BatchDrake/suscan
++comment "sigutils needs a toolchain w/ threads"
++        depends on !BR2_TOOLCHAIN_HAS_THREADS
+diff --git a/package/suscan/suscan.mk b/package/suscan/suscan.mk
+new file mode 100755
+index 0000000000..8196d74f32
+--- /dev/null
++++ b/package/suscan/suscan.mk
+@@ -0,0 +1,24 @@
++################################################################################
++#
++# SUSCAN
++#
++################################################################################
++
++
++#SUSCAN_VERSION =  v0.1.0
++SUSCAN_VERSION = 37dad542b97aff24654f0bb80fb8e85af7cb84ab
++SUSCAN_SITE = https://github.com/BatchDrake/suscan
++SUSCAN_SOURCE = suscan-0.1.0.tar.gz
++#SUSCAN-$(SUSCAN_VERSION).tar.gz
++
++#SUSCAN_VERSION = 571cc9aeccb2004d81032cea484324aacb1a5852
++
++SUSCAN_SITE_METHOD = git
++
++SUSCAN_INSTALL_STAGING = YES
++SUSCAN_LICENSE = GPL-2.0
++#SUSCAN_LICENSE_FILES = LICENSE
++SUSCAN_DEPENDENCIES +=  
++
++
++$(eval $(cmake-package))
+diff --git a/package/tx-tools/Config.in b/package/tx-tools/Config.in
+new file mode 100755
+index 0000000000..d3194205f8
+--- /dev/null
++++ b/package/tx-tools/Config.in
+@@ -0,0 +1,10 @@
++config BR2_PACKAGE_TX-TOOLS
++        bool "tx-tools"
++        depends on BR2_TOOLCHAIN_HAS_THREADS
++        depends on BR2_PACKAGE_SOAPYSDR
++        help
++          tx_sdr tool for transmitting data to SDRs, based on rtl_sdr from librtlsdr, and rx_sdr from rx_tools, using the SoapySDR vendor-neutral SDR support library, intended to support a wide range of TX-capable devices. 
++
++          https://github.com/triq-org/tx_tools
++comment "tx_tools needs a toolchain w/ threads"
++        depends on !BR2_TOOLCHAIN_HAS_THREADS
+diff --git a/package/tx-tools/tx_tools.mk b/package/tx-tools/tx_tools.mk
+new file mode 100755
+index 0000000000..4ad777090b
+--- /dev/null
++++ b/package/tx-tools/tx_tools.mk
+@@ -0,0 +1,16 @@
++################################################################################
++#
++# TX_TOOLS
++#
++################################################################################
++TX_TOOLS_VERSION := 252989cb06a7fe2f453f11ea9ebc72111fe77122
++TX_TOOLS_SITE := https://github.com/triq-org/tx_tools
++TX_TOOLS_SITE_METHOD := git
++TX_TOOLS_INSTALL_TARGET := YES
++TX_TOOLS_INSTALL_STAGING := YES
++TX_TOOLS_LICENSE := GPL-2.0
++TX_TOOLS_LICENSE_FILES :=  COPYING
++TX_TOOLS_DEPENDENCIES +=  soapysdr
++TX_TOOLS_CONF_OPTS := -DCFLAGS=$(TARGET_CC) -DCXXFLAGS=$(TARGET_CXX)
++
++$(eval $(cmake-package))
