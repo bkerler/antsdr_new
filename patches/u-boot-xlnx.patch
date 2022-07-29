@@ -1,20 +1,4 @@
-From 4a83728b23c9032bc9e2827484b028f380a60e37 Mon Sep 17 00:00:00 2001
-From: black-pigeon <1530604142@qq.com>
-Date: Sat, 19 Jun 2021 17:12:51 +0800
-Subject: [PATCH 57/60] Add support for  ANTSDR
-
----
- arch/arm/dts/Makefile           |  1 +
- arch/arm/dts/zynq-pluto-sdr.dts | 85 +++++++++++++++++++++++++++++++++
- configs/zynq_pluto_defconfig    | 61 +++++++++++++++++++++++
- include/configs/zynq-common.h   | 55 +++++++++++++++++----
- include/configs/zynq_zc70x.h    |  1 +
- 5 files changed, 193 insertions(+), 10 deletions(-)
- create mode 100644 arch/arm/dts/zynq-pluto-sdr.dts
- create mode 100644 configs/zynq_pluto_defconfig
-
-diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index f27cc3cb322..fa5b49ccef1 100644
+unchanged:
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -101,7 +101,8 @@ dtb-$(CONFIG_ARCH_ZYNQ) += zynq-zc702.dtb \
@@ -27,9 +11,7 @@ index f27cc3cb322..fa5b49ccef1 100644
  dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-ep108.dtb			\
  	zynqmp-zcu100.dtb			\
-diff --git a/arch/arm/dts/zynq-ant-sdr.dts b/arch/arm/dts/zynq-ant-sdr.dts
-new file mode 100644
-index 00000000000..d581709ffbc
+unchanged:
 --- /dev/null
 +++ b/arch/arm/dts/zynq-ant-sdr.dts
 @@ -0,0 +1,77 @@
@@ -170,7 +152,7 @@ unchanged:
 +CONFIG_G_DNL_PRODUCT_NUM=0xb674
 +CONFIG_REGEX=y
 +CONFIG_LIB_RAND=y
-diff -u b/arch/arm/dts/zynq-ant-sdr.dts b/arch/arm/dts/zynq-ant-sdr.dts
+unchanged:
 --- b/arch/arm/dts/zynq-ant-sdr.dts
 +++ b/arch/arm/dts/zynq-ant-sdr.dts
 @@ -1,7 +1,7 @@
@@ -277,6 +259,7 @@ unchanged:
  CONFIG_CMD_SF=y
  CONFIG_CMD_SPI=y
  CONFIG_CMD_USB=y
+unchanged:
 --- b/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -270,57 +270,54 @@
@@ -381,4 +364,84 @@ unchanged:
  	"usbboot=if usb start; then " \
  			"run uenvboot; " \
  			"echo Copying Linux from USB to RAM... && " \
-
+only in patch2:
+unchanged:
+--- a/include/configs/zynq-common.h
++++ b/include/configs/zynq-common.h
+@@ -270,12 +270,9 @@
+ 		"fi; \0" \
+ 	"refclk_source=internal\0" \
+ 	"mode=1r1t\0" \
+-	"adi_loadvals=fdt addr ${fit_load_address} && fdt get value fdt_choosen /configurations/${fit_config}/ fdt && " \
+-		"fdt get addr fdtaddr /images/${fdt_choosen} data && fdt addr ${fdtaddr}; "\
+-		"if test -n ${ad936x_ext_refclk} && test ! -n ${ad936x_skip_ext_refclk}; then " \
++	"adi_loadvals_pluto=if test -n ${ad936x_ext_refclk} && test ! -n ${ad936x_skip_ext_refclk}; then " \
+ 			"fdt set /clocks/clock@0 clock-frequency ${ad936x_ext_refclk}; " \
+ 		"fi; " \
+-		"fdt get value model / model; " \
+ 		"if test -n ${ad936x_ext_refclk_override} && test \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\"; then " \
+ 			"fdt set /clocks/clock@0 clock-frequency ${ad936x_ext_refclk_override}; " \
+ 		"fi; " \
+@@ -288,8 +285,8 @@
+ 		"if test ${refclk_source} = external || test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
+ 			"fdt rm /amba/gpio@e000a000/clock_internal_en || fdt rm /axi/gpio@e000a000/clock_internal_en; " \
+ 		"fi; " \
+-		"if test -n ${compatible} && test ! ${compatible} = ad9361 && test ! ${compatible} = ad9364 && test ! ${compatible} = ad9364; then " \
+-			"setenv compatible ad9364; " \
++		"if test -n ${compatible} && test ! ${compatible} = ad9361 && test ! ${compatible} = ad9363a && test ! ${compatible} = ad9364; then " \
++			"setenv compatible ad9363a; " \
+ 			"saveenv; " \
+ 		"fi; " \
+ 		"if test -n ${mode} && test ! ${mode} = 1r1t && test ! ${mode} = 2r2t; then " \
+@@ -304,21 +301,30 @@
+ 			"fdt set /amba/spi@e0006000/ad9361-phy@0 compatible ${compatible} || fdt set /axi/spi@e0006000/ad9361-phy@0 compatible ${compatible};" \
+ 		"fi; " \
+ 		"if test  ${compatible} = ad9361 && test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
+-			"fdt set /amba/spi@e0006000/ad9361-phy@0 compatible ad9364 || fdt set /axi/spi@e0006000/ad9361-phy@0 compatible ad9364; " \
+-			"compatible=ad9364; " \
++			"fdt set /amba/spi@e0006000/ad9361-phy@0 compatible ad9363a || fdt set /axi/spi@e0006000/ad9361-phy@0 compatible ad9363a; " \
++			"compatible=ad9363a; " \
+ 		"fi; " \
+ 		"if test ${mode} = 1r1t || test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\"; then " \
+ 			"fdt rm /amba/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable || fdt rm /axi/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable; " \
++			"fdt set /fpga-axi/cf-ad9361-dds-core-lpc@79024000 compatible adi,axi-ad9364-dds-6.00.a; " \
+ 		"fi; " \
+ 		"if test -n ${cs_gpio}; then " \
+ 			"fdt set /amba/axi_quad_spi@7C430000/ cs-gpios \"<0x06 ${cs_gpio} 0>\" || fdt set /axi/axi_quad_spi@7C430000/ cs-gpios \"<0x06 ${cs_gpio} 0>\"; " \
+ 		"fi; " \
+-		"if test ${compatible} = ad9364 || test -n ${attr_val} = ad9364; then " \
+-			"fdt rm /amba/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable || fdt rm /axi/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable; " \
++		"if test \"${compatible}\" = ad9364 || test \"${attr_val}\" = ad9364; then " \
+ 			"fdt set /fpga-axi/cf-ad9361-dds-core-lpc@79024000 compatible adi,axi-ad9364-dds-6.00.a; " \
+-			"setenv mode 1r1t; " \
+-			"saveenv; " \
++			"if test ! ${mode} = 1r1t; then " \
++				"fdt rm /amba/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable || fdt rm /axi/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable; " \
++				"setenv mode 1r1t; " \
++				"saveenv; " \
++			"fi; " \
+ 		"fi; \0" \
++	"adi_loadvals=fdt addr ${fit_load_address} && fdt get value fdt_choosen /configurations/${fit_config}/ fdt && " \
++		"fdt get addr fdtaddr /images/${fdt_choosen} data && fdt addr ${fdtaddr}; "\
++		"fdt get value model / model; " \
++		"if test \"${model}\" \> \"Analog Devices Pluto\"; then " \
++			"run adi_loadvals_pluto; " \
++ 		"fi; \0" \
+ 	"qspiboot_extraenv=sf read ${extraenv_load_address} 0xFF000 0x1000 && " \
+ 		"env import -c ${extraenv_load_address} 0x1000 || true \0" \
+ 	"read_sf=sf probe 0:0 50000000 0 && run qspiboot_extraenv &&" \
+@@ -359,14 +365,6 @@
+ 			"echo Running uenvcmd ...; " \
+ 			"run uenvcmd; " \
+ 		"fi\0" \
+-	"sdboot=if mmcinfo; then " \
+-			"run uenvboot; " \
+-			"echo Copying Linux from SD to RAM... && " \
+-			"load mmc 0 ${fit_load_address} ${kernel_image} && " \
+-			"load mmc 0 ${devicetree_load_address} ${devicetree_image} && " \
+-			"load mmc 0 ${ramdisk_load_address} ${ramdisk_image} && " \
+-			"bootm ${fit_load_address} ${ramdisk_load_address} ${devicetree_load_address}; " \
+-		"fi\0" \
+ 	"usbboot=if usb start; then " \
+ 			"run uenvboot; " \
+ 			"echo Copying Linux from USB to RAM... && " \
