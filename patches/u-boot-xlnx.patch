@@ -1,0 +1,384 @@
+From 4a83728b23c9032bc9e2827484b028f380a60e37 Mon Sep 17 00:00:00 2001
+From: black-pigeon <1530604142@qq.com>
+Date: Sat, 19 Jun 2021 17:12:51 +0800
+Subject: [PATCH 57/60] Add support for  ANTSDR
+
+---
+ arch/arm/dts/Makefile           |  1 +
+ arch/arm/dts/zynq-pluto-sdr.dts | 85 +++++++++++++++++++++++++++++++++
+ configs/zynq_pluto_defconfig    | 61 +++++++++++++++++++++++
+ include/configs/zynq-common.h   | 55 +++++++++++++++++----
+ include/configs/zynq_zc70x.h    |  1 +
+ 5 files changed, 193 insertions(+), 10 deletions(-)
+ create mode 100644 arch/arm/dts/zynq-pluto-sdr.dts
+ create mode 100644 configs/zynq_pluto_defconfig
+
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index f27cc3cb322..fa5b49ccef1 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -101,7 +101,8 @@ dtb-$(CONFIG_ARCH_ZYNQ) += zynq-zc702.dtb \
+ 	zynq-zc770-xm010.dtb \
+ 	zynq-zc770-xm011.dtb \
+ 	zynq-zc770-xm012.dtb \
+-	zynq-zc770-xm013.dtb
++	zynq-zc770-xm013.dtb \
++	zynq-ant-sdr.dtb
+ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+ 	zynqmp-ep108.dtb			\
+ 	zynqmp-zcu100.dtb			\
+diff --git a/arch/arm/dts/zynq-ant-sdr.dts b/arch/arm/dts/zynq-ant-sdr.dts
+new file mode 100644
+index 00000000000..d581709ffbc
+--- /dev/null
++++ b/arch/arm/dts/zynq-ant-sdr.dts
+@@ -0,0 +1,77 @@
++/*
++ * Analog Devices Inc. Pluto SDR board DTS
++ *
++ * Copyright (C) 2015-2018 Analog Devices Inc.
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++/dts-v1/;
++#include "zynq-7000.dtsi"
++
++/ {
++	model = "Zynq Pluto SDR Board";
++	compatible = "xlnx,zynq-7000";
++
++	aliases {
++		ethernet0 = &gem0;
++		serial0 = &uart1;
++		spi0 = &qspi;
++	};
++
++	memory {
++		device_type = "memory";
++		reg = <0x0 0x20000000>;
++	};
++
++	chosen {
++		bootargs = "earlyprintk";
++		linux,stdout-path = &uart1;
++		stdout-path = &uart1;
++	};
++
++	usb_phy0: phy0 {
++		compatible = "usb-nop-xceiv";
++		#phy-cells = <0>;
++	};
++};
++
++&qspi {
++	status = "okay";
++	is-dual = <0>;
++	num-cs = <1>;
++	flash@0 {
++		compatible = "n25q256a11,";
++		reg = <0x0>;
++		spi-tx-bus-width = <1>;
++		spi-rx-bus-width = <4>;
++		spi-max-frequency = <50000000>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		partition@qspi-fsbl-uboot {
++			label = "qspi-fsbl-uboot";
++			reg = <0x0 0x100000>; /* 1M */
++		};
++		partition@qspi-uboot-env {
++			label = "qspi-uboot-env";
++			reg = <0x100000 0x20000>; /* 128k */
++		};
++		partition@qspi-nvmfs {
++			label = "qspi-nvmfs";
++			reg = <0x120000 0xE0000>; /* 1M */
++		};
++		partition@qspi-linux {
++			label = "qspi-linux";
++			reg = <0x200000 0x1E00000>; /* 30M */
++		};
++	};
++};
++
++&uart1 {
++	status = "okay";
++};
++
++&usb0 {
++	status = "okay";
++	dr_mode = "otg";
++	usb-phy = <&usb_phy0>;
++};
+unchanged:
+--- /dev/null
++++ b/configs/zynq_ant_defconfig
+@@ -0,0 +1,56 @@
++CONFIG_ARM=y
++CONFIG_SYS_CONFIG_NAME="zynq_zc70x"
++CONFIG_ARCH_ZYNQ=y
++CONFIG_SYS_MALLOC_F_LEN=0x800
++CONFIG_DEFAULT_DEVICE_TREE="zynq-ant-sdr"
++CONFIG_SPL=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_FIT_SIGNATURE=y
++CONFIG_BOOTDELAY=0
++CONFIG_SYS_NO_FLASH=y
++CONFIG_HUSH_PARSER=y
++CONFIG_SYS_PROMPT="Pluto> "
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_XIMG is not set
++# CONFIG_CMD_FLASH is not set
++CONFIG_CMD_SF=y
++CONFIG_CMD_SPI=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_DFU=y
++CONFIG_CMD_GPIO=y
++# CONFIG_CMD_SETEXPR is not set
++# CONFIG_CMD_NET is not set
++# CONFIG_CMD_NFS is not set
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EXT2=y
++CONFIG_CMD_EXT4=y
++CONFIG_CMD_EXT4_WRITE=y
++CONFIG_CMD_FAT=y
++CONFIG_CMD_FS_GENERIC=y
++CONFIG_OF_EMBED=y
++CONFIG_SPL_DM_SEQ_ALIAS=y
++CONFIG_LED=y
++CONFIG_LED_GPIO=y
++CONFIG_SPI_FLASH=y
++CONFIG_SPI_FLASH_BAR=y
++CONFIG_SPI_FLASH_ISSI=y
++CONFIG_SPI_FLASH_MACRONIX=y
++CONFIG_SPI_FLASH_SPANSION=y
++CONFIG_SPI_FLASH_STMICRO=y
++CONFIG_SPI_FLASH_WINBOND=y
++CONFIG_ZYNQ_QSPI=y
++CONFIG_USB=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_ULPI_VIEWPORT=y
++CONFIG_USB_ULPI=y
++CONFIG_USB_STORAGE=y
++CONFIG_USB_GADGET=y
++CONFIG_CI_UDC=y
++CONFIG_USB_GADGET_VBUS_DRAW=500
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_G_DNL_MANUFACTURER="Analog Devices Inc."
++CONFIG_G_DNL_VENDOR_NUM=0x0456
++CONFIG_G_DNL_PRODUCT_NUM=0xb674
++CONFIG_REGEX=y
++CONFIG_LIB_RAND=y
+diff -u b/arch/arm/dts/zynq-ant-sdr.dts b/arch/arm/dts/zynq-ant-sdr.dts
+--- b/arch/arm/dts/zynq-ant-sdr.dts
++++ b/arch/arm/dts/zynq-ant-sdr.dts
+@@ -1,7 +1,7 @@
+ /*
+- * Analog Devices Inc. Pluto SDR board DTS
++ * MicroPhase Inc. ANTSDR board DTS
+  *
+- * Copyright (C) 2015-2018 Analog Devices Inc.
++ * Copyright (C) 2015-2018 MicroPhase Inc.
+  *
+  * SPDX-License-Identifier:	GPL-2.0+
+  */
+@@ -9,7 +9,7 @@
+ #include "zynq-7000.dtsi"
+ 
+ / {
+-	model = "Zynq Pluto SDR Board";
++	model = "ANT SDR Board";
+ 	compatible = "xlnx,zynq-7000";
+ 
+ 	aliases {
+@@ -20,7 +20,7 @@
+ 
+ 	memory {
+ 		device_type = "memory";
+-		reg = <0x0 0x20000000>;
++		reg = <0x0 0x40000000>;
+ 	};
+ 
+ 	chosen {
+@@ -33,14 +33,34 @@
+ 		compatible = "usb-nop-xceiv";
+ 		#phy-cells = <0>;
+ 	};
++	gpio_keys {
++		compatible = "gpio-keys";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		button {
++			label = "Button";
++			gpios = <&gpio0 14 0>;
++			linux,code = <103>; /* up */
++			wakeup-source;
++			autorepeat;
++		};
++
++	};
++	
++	
+ };
+ 
++
++
++	
++
++
+ &qspi {
+ 	status = "okay";
+ 	is-dual = <0>;
+ 	num-cs = <1>;
+ 	flash@0 {
+-		compatible = "n25q256a11,";
++		compatible = "n25q512a","micron,m25p80";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+@@ -75,3 +95,19 @@
+-	dr_mode = "otg";
++	dr_mode = "host";
+ 	usb-phy = <&usb_phy0>;
+ };
++&sdhci0 {
++	u-boot,dm-pre-reloc;
++	status = "okay";
++	
++};
++
++&gem0 {
++	status = "okay";
++	phy-mode = "rgmii-id";
++	phy-handle = <&ethernet_phy0>;
++
++	ethernet_phy0: ethernet-phy@0 {
++		reg = <0>;
++		reset-gpios = <&gpio0 46 0>;
++	};
++};
+unchanged:
+--- a/configs/zynq_ant_defconfig
++++ b/configs/zynq_ant_defconfig
+@@ -14,6 +14,15 @@ CONFIG_SYS_PROMPT="Pluto> "
+ # CONFIG_CMD_IMLS is not set
+ # CONFIG_CMD_XIMG is not set
+ # CONFIG_CMD_FLASH is not set
++
++CONFIG_ZYNQ_SDHCI=y
++CONFIG_CMD_MMC=y
++
++CONFIG_MMC_SDHCI=y
++CONFIG_MMC_SDHCI_ZYNQ=y
++
++CONFIG_SD_BOOT=y
++
+ CONFIG_CMD_SF=y
+ CONFIG_CMD_SPI=y
+ CONFIG_CMD_USB=y
+--- b/include/configs/zynq-common.h
++++ b/include/configs/zynq-common.h
+@@ -270,57 +270,54 @@
+ 		"fi; \0" \
+ 	"refclk_source=internal\0" \
+ 	"mode=1r1t\0" \
+-	"adi_loadvals_pluto=if test -n \"${ad936x_ext_refclk}\" && test ! -n \"${ad936x_skip_ext_refclk}\"; then " \
++	"adi_loadvals=fdt addr ${fit_load_address} && fdt get value fdt_choosen /configurations/${fit_config}/ fdt && " \
++		"fdt get addr fdtaddr /images/${fdt_choosen} data && fdt addr ${fdtaddr}; "\
++		"if test -n ${ad936x_ext_refclk} && test ! -n ${ad936x_skip_ext_refclk}; then " \
+ 			"fdt set /clocks/clock@0 clock-frequency ${ad936x_ext_refclk}; " \
+ 		"fi; " \
+-		"if test -n \"${ad936x_ext_refclk_override}\"; then " \
++		"fdt get value model / model; " \
++		"if test -n ${ad936x_ext_refclk_override} && test \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\"; then " \
+ 			"fdt set /clocks/clock@0 clock-frequency ${ad936x_ext_refclk_override}; " \
+ 		"fi; " \
+-		"if test -n \"${refclk_source}\" && test ! \"${refclk_source}\" = \"internal\" && test ! \"${refclk_source}\" = \"external\"; then " \
+-			"setenv refclk_source internal; " \
+-			"saveenv; " \
+-		"fi; " \
+-		"if test \"${refclk_source}\" = \"internal\" && test \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
++		"if test ${refclk_source} = internal || test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
+ 			"fdt rm /amba/gpio@e000a000/clock_extern_en || fdt rm /axi/gpio@e000a000/clock_extern_en; " \
+ 		"fi; " \
+-		"if test \"${refclk_source}\" = \"external\" && test \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
++		"if test -n ${attr_name} && test -n ${attr_val}; then " \
++			"fdt set /amba/spi@e0006000/ad9361-phy@0 ${attr_name} ${attr_val} || fdt set /axi/spi@e0006000/ad9361-phy@0 ${attr_name} ${attr_val}; " \
++                "fi; " \
++		"if test ${refclk_source} = external || test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
+ 			"fdt rm /amba/gpio@e000a000/clock_internal_en || fdt rm /axi/gpio@e000a000/clock_internal_en; " \
+ 		"fi; " \
+-		"if test  \"${attr_val}\" = \"ad9361\" && test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
+-			"setenv attr_val ad9363a; " \
++		"if test -n ${compatible} && test ! ${compatible} = ad9361 && test ! ${compatible} = ad9364 && test ! ${compatible} = ad9364; then " \
++			"setenv compatible ad9364; " \
+ 			"saveenv; " \
+ 		"fi; " \
+-		"if test -n \"${attr_val}\" && test ! \"${attr_val}\" = \"ad9361\" && test ! \"${attr_val}\" = \"ad9363a\" && test ! \"${attr_val}\" = \"ad9364\"; then " \
+-			"setenv attr_val ad9363a; " \
++		"if test -n ${mode} && test ! ${mode} = 1r1t && test ! ${mode} = 2r2t; then " \
++			"setenv mode 1r1t; " \
+ 			"saveenv; " \
+ 		"fi; " \
+-		"if test -n \"${mode}\" && test ! \"${mode}\" = \"1r1t\" && test ! \"${mode}\" = \"2r2t\"; then " \
+-			"setenv mode 1r1t; " \
++		"if test -n ${refclk_source} && test ! ${refclk_source} = internal && test ! ${refclk_source} = external; then " \
++			"setenv refclk_source internal; " \
+ 			"saveenv; " \
+ 		"fi; " \
+-		"if test -n \"${attr_name}\" && test -n \"${attr_val}\"; then " \
+-			"fdt set /amba/spi@e0006000/ad9361-phy@0 ${attr_name} ${attr_val} || fdt set /axi/spi@e0006000/ad9361-phy@0 ${attr_name} ${attr_val}; " \
+-                "fi; " \
+-		"if test \"${mode}\" = \"1r1t\" && test \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\"; then " \
++		"if test -n ${compatible}; then " \
++			"fdt set /amba/spi@e0006000/ad9361-phy@0 compatible ${compatible} || fdt set /axi/spi@e0006000/ad9361-phy@0 compatible ${compatible};" \
++		"fi; " \
++		"if test  ${compatible} = ad9361 && test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\" ; then " \
++			"fdt set /amba/spi@e0006000/ad9361-phy@0 compatible ad9364 || fdt set /axi/spi@e0006000/ad9361-phy@0 compatible ad9364; " \
++			"compatible=ad9364; " \
++		"fi; " \
++		"if test ${mode} = 1r1t || test ! \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\"; then " \
+ 			"fdt rm /amba/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable || fdt rm /axi/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable; " \
+-			"fdt set /fpga-axi/cf-ad9361-dds-core-lpc@79024000 compatible adi,axi-ad9364-dds-6.00.a; " \
+ 		"fi; " \
+-		"if test -n \"${cs_gpio}\" && test \"${model}\" = \"Analog Devices PlutoSDR Rev.C (Z7010/AD9363)\"; then " \
++		"if test -n ${cs_gpio}; then " \
+ 			"fdt set /amba/axi_quad_spi@7C430000/ cs-gpios \"<0x06 ${cs_gpio} 0>\" || fdt set /axi/axi_quad_spi@7C430000/ cs-gpios \"<0x06 ${cs_gpio} 0>\"; " \
+ 		"fi; " \
+-		"if test -n \"${attr_val}\" && test \"${attr_val}\" = \"ad9364\"; then " \
++		"if test ${compatible} = ad9364 || test -n ${attr_val} = ad9364; then " \
++			"fdt rm /amba/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable || fdt rm /axi/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable; " \
+ 			"fdt set /fpga-axi/cf-ad9361-dds-core-lpc@79024000 compatible adi,axi-ad9364-dds-6.00.a; " \
+-			"if test ! \"${mode}\" = \"1r1t\"; then " \
+-				"fdt rm /amba/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable || fdt rm /axi/spi@e0006000/ad9361-phy@0 adi,2rx-2tx-mode-enable; " \
+-				"setenv mode 1r1t; " \
+-				"saveenv; " \
+-			"fi; " \
+-		"fi; \0" \
+-	"adi_loadvals=fdt addr ${fit_load_address} && fdt get value fdt_choosen /configurations/${fit_config}/ fdt && " \
+-		"fdt get addr fdtaddr /images/${fdt_choosen} data && fdt addr ${fdtaddr}; "\
+-		"fdt get value model / model; " \
+-		"if test \"${model}\" \> \"Analog Devices Pluto\"; then " \
+-			"run adi_loadvals_pluto; " \
++			"setenv mode 1r1t; " \
++			"saveenv; " \
+ 		"fi; \0" \
+ 	"qspiboot_extraenv=sf read ${extraenv_load_address} 0xFF000 0x1000 && " \
+ 		"env import -c ${extraenv_load_address} 0x1000 || true \0" \
+@@ -362,6 +359,14 @@
+ 			"echo Running uenvcmd ...; " \
+ 			"run uenvcmd; " \
+ 		"fi\0" \
++	"sdboot=if mmcinfo; then " \
++			"run uenvboot; " \
++			"echo Copying Linux from SD to RAM... && " \
++			"load mmc 0 ${fit_load_address} ${kernel_image} && " \
++			"load mmc 0 ${devicetree_load_address} ${devicetree_image} && " \
++			"load mmc 0 ${ramdisk_load_address} ${ramdisk_image} && " \
++			"bootm ${fit_load_address} ${ramdisk_load_address} ${devicetree_load_address}; " \
++		"fi\0" \
+ 	"usbboot=if usb start; then " \
+ 			"run uenvboot; " \
+ 			"echo Copying Linux from USB to RAM... && " \
+
