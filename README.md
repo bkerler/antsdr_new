@@ -43,7 +43,7 @@ If you like to add other stuff like gnuradio and some sdr goodies, then run also
 ./patch_additional.sh
 ```
 
-For building, just follow the plutosdr-fw repo (here)[https://github.com/analogdevicesinc/plutosdr-fw]
+For building, just follow the plutosdr-fw repo [here](https://github.com/analogdevicesinc/plutosdr-fw).
 
 
 ## Build Artifacts
