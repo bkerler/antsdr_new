@@ -31,15 +31,3 @@ index 303b2f7..9b3d683 100644
  	exit 1
  else
  all: clean-build $(TARGETS) zip-all legal-info
-diff --git a/linux b/linux
---- a/linux
-+++ b/linux
-@@ -1 +1 @@
--Subproject commit 9dfba10b795d0004ae90f2ab29dac0197c8a3b3e
-+Subproject commit 9dfba10b795d0004ae90f2ab29dac0197c8a3b3e-dirty
-diff --git a/u-boot-xlnx b/u-boot-xlnx
---- a/u-boot-xlnx
-+++ b/u-boot-xlnx
-@@ -1 +1 @@
--Subproject commit 90401ce9ce029e5563f4dface63914d42badf5bc
-+Subproject commit 90401ce9ce029e5563f4dface63914d42badf5bc-dirty
