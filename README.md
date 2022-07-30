@@ -30,10 +30,20 @@ The ANTSDR E310 schematic is in the [schematic folder](./schematic),  you can fi
 
 ## Build Instructions
 
+- Install dependencies
+
+!!! Make sure Xilinx Vivado Standard 2021.1 is installed to /opt/Xilinx. Also make sure that the Xilinx Vivado SDK 2019.1 is installed to /opt/Xilinx/SDK. !!!
+
 ```bash
 git clone https://github.com/bkerler/antsdr_new
 cd antsdr_new
+./install_dependencies.sh
 ./update_submodules.sh
+```
+
+- Install patches needed for antsdr
+
+```bash
 ./patch_antsdr.sh
 ```
 
@@ -43,7 +53,18 @@ If you like to add other stuff like gnuradio and some sdr goodies, then run also
 ./patch_additional.sh
 ```
 
-For building, just follow the plutosdr-fw repo [here](https://github.com/analogdevicesinc/plutosdr-fw).
+- Building
+```bash
+source ./prepare.sh
+make -j `nproc`
+```
+
+- Make SD card boot image
+After the firmware building finished, you can build the SD card boot image for [ANTSDR](https://item.taobao.com/item.htm?spm=a230r.1.14.16.34e21142YIlxqx&id=647986963313&ns=1&abbucket=2#detail). Just type the following command.
+```bash
+make sdimg
+```
+You will see the SD boot image in the build_sdimg folder. You can just copy all these files in that folder into a SD card, plug the SD card into the ANTSDR, set the jumper into SD card boot mode.
 
 
 ## Build Artifacts
@@ -84,12 +105,6 @@ drwxrwxr-x 6 wcc 4.0K 7月   8 09:31 sdk
 -rw-rw-r-- 1 wcc  17K 7月   8 09:29 zynq-ant-sdr-revc.dtb
 ```
 
-## Make SD card boot image
-After the firmware building finished, you can build the SD card boot image for [ANTSDR](https://item.taobao.com/item.htm?spm=a230r.1.14.16.34e21142YIlxqx&id=647986963313&ns=1&abbucket=2#detail). Just type the following command.
-```bash
-make sdimg
-```
-You will see the SD boot image in the build_sdimg folder. You can just copy all these files in that folder into a SD card, plug the SD card into the ANTSDR, set the jumper into SD card boot mode.
 
 ## Update Flash by DFU
 The ANTSDR also support flash boot mode. You can update the flash by DFU. Set the jumper into Flash Boot mode. When ANTSDR is power up, push the DFU button, and then, you will see the both led in the ANTSDR will turn green, now it's time to update the flash.
