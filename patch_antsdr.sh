@@ -1,7 +1,7 @@
 #!/bin/sh
 cd plutosdr-fw
 git apply -p1 < ../patches/antsdr_main.patch
-cd plutosdr-fw/buildroot
+cd buildroot
 git apply -p1 < ../../patches/buildroot.patch 
 cd ../hdl
 git apply -p1 < ../../patches/hdl.patch
