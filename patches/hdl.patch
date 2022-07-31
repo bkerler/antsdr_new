@@ -48,7 +48,7 @@ new file mode 100644
 index 0000000000..51c9db6d74
 --- /dev/null
 +++ b/projects/ant/system_bd.tcl
-@@ -0,0 +1,353 @@
+@@ -0,0 +1,351 @@
 +# create board design
 +
 +
@@ -400,14 +400,12 @@ index 0000000000..51c9db6d74
 +ad_cpu_interrupt ps-13 mb-13 axi_ad9361_adc_dma/irq
 +ad_cpu_interrupt ps-12 mb-12 axi_ad9361_dac_dma/irq
 +ad_cpu_interrupt ps-11 mb-11 axi_spi/ip2intc_irpt
-+
-+
 diff --git a/projects/ant/system_constr.xdc b/projects/ant/system_constr.xdc
 new file mode 100644
 index 0000000000..f67e3c0e63
 --- /dev/null
 +++ b/projects/ant/system_constr.xdc
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,144 @@
 +set_property PACKAGE_PIN P16 [get_ports gpio_en_agc]
 +set_property PACKAGE_PIN N17 [get_ports gpio_resetb]
 +set_property PACKAGE_PIN T10 [get_ports {gpio_ctl[0]}]
@@ -552,13 +550,12 @@ index 0000000000..f67e3c0e63
 +set_property PACKAGE_PIN A20 [get_ports VCRX2_L]
 +set_property PACKAGE_PIN D18 [get_ports VCTX2_H]
 +set_property PACKAGE_PIN D19 [get_ports VCTX2_L]
-+
 diff --git a/projects/ant/system_project.tcl b/projects/ant/system_project.tcl
 new file mode 100644
 index 0000000000..6d0a646f8b
 --- /dev/null
 +++ b/projects/ant/system_project.tcl
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,16 @@
 +
 +source ../scripts/adi_env.tcl
 +source $ad_hdl_dir/projects/scripts/adi_project_xilinx.tcl
@@ -575,13 +572,12 @@ index 0000000000..6d0a646f8b
 +set_property is_enabled false [get_files  *system_sys_ps7_0.xdc]
 +adi_project_run ant
 +source $ad_hdl_dir/library/axi_ad9361/axi_ad9361_delay.tcl
-+
 diff --git a/projects/ant/system_top.v b/projects/ant/system_top.v
 new file mode 100644
 index 0000000000..1dca87d62d
 --- /dev/null
 +++ b/projects/ant/system_top.v
-@@ -0,0 +1,196 @@
+@@ -0,0 +1,195 @@
 +// ***************************************************************************
 +// ***************************************************************************
 +// Copyright 2014 - 2017 (c) Analog Devices, Inc. All rights reserved.
@@ -675,7 +671,7 @@ index 0000000000..1dca87d62d
 +  output          VCRX2_L,
 +  output          VCTX2_H,
 +  output          VCTX2_L,
-+  
++
 +  // output          ltc2630_mosi_0,
 +  // output          ltc2630_ncs_0,
 +  // output          ltc2630_sclk_0,
@@ -710,7 +706,7 @@ index 0000000000..1dca87d62d
 +  assign VCRX2_L=gpio_o[22];
 +  assign VCTX2_H=gpio_o[23];
 +  assign VCTX2_L=gpio_o[24];
-+  
++
 +
 +  system_wrapper i_system_wrapper (
 +    .ddr_addr (ddr_addr),
@@ -743,7 +739,7 @@ index 0000000000..1dca87d62d
 +    .rx_clk_in (rx_clk_in),
 +    .rx_data_in (rx_data_in),
 +    .rx_frame_in (rx_frame_in),
-+    
++
 +    // .ltc2630_mosi_0(ltc2630_mosi_0),
 +    // .ltc2630_ncs_0(ltc2630_ncs_0),
 +    // .ltc2630_sclk_0(ltc2630_sclk_0),
@@ -777,4 +773,4 @@ index 0000000000..1dca87d62d
 +
 +// ***************************************************************************
 +// ***************************************************************************
-+
+
