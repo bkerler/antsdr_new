@@ -180,7 +180,7 @@ diff --git a/configs/zynq_ant_defconfig b/configs/zynq_ant_defconfig
 index f1b365cbb0..2ec8361371 100644
 --- a/configs/zynq_ant_defconfig
 +++ b/configs/zynq_ant_defconfig
-@@ -57,9 +57,82 @@ BR2_PACKAGE_WPA_SUPPLICANT_CLI=y
+@@ -57,9 +57,81 @@ BR2_PACKAGE_WPA_SUPPLICANT_CLI=y
  BR2_PACKAGE_WPA_SUPPLICANT_PASSPHRASE=y
  BR2_PACKAGE_POLL_SYSFS=y
  BR2_PACKAGE_AD936X_REF_CAL=y
@@ -231,9 +231,9 @@ index f1b365cbb0..2ec8361371 100644
 +BR2_PACKAGE_LAME=y
 +BR2_PACKAGE_LIBCONFIG=y
 +BR2_PACKAGE_LIBSHOUT=y
-+BR2_PACKAGE_LIBOGG=y  
++BR2_PACKAGE_LIBOGG=y
 +BR2_PACKAGE_LIBVORBIS=y
-+BR2_PACKAGE_HOST_PKGCONF=y 
++BR2_PACKAGE_HOST_PKGCONF=y
 +BR2_PACKAGE_OPENSSL=y
 +BR2_PACKAGE_LIBOPENSSL=y
 +BR2_PACKAGE_LIBOPENSSL_BIN=y
@@ -262,7 +262,6 @@ index f1b365cbb0..2ec8361371 100644
 +# BR2_PACKAGE_CHARON=y
 +# BR2_PACKAGE_CSDR is not set
 +# BR2_PACKAGE_LIBDVBMOD is not set
-+
 diff --git a/package/Config.in b/package/Config.in
 index 5e690d7a7a..259a1054d9 100644
 --- a/package/Config.in
@@ -353,7 +352,7 @@ new file mode 100755
 index 0000000000..b92c70273c
 --- /dev/null
 +++ b/package/SoapyRemote/soapyremote.mk
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,21 @@
 +################################################################################
 +#
 +# soapyremote
@@ -369,26 +368,24 @@ index 0000000000..b92c70273c
 +SOAPYREMOTE_LICENSE = Boost Software License 1.0
 +SOAPYREMOTE_LICENSE_FILES = LICENSE_1_0.txt
 +SOAPYREMOTE_DEPENDENCIES += soapysdr
-+SOAPYREMOTE_TARGET: $(SOAPYREMOTE_DEPENDENCIES) 
++SOAPYREMOTE_TARGET: $(SOAPYREMOTE_DEPENDENCIES)
 +
 +#SOAPYREMOTE_CONF_OPTS = -DBUILD_DEMOS=ON
 +#SOAPYREMOTE_DEPENDENCIES = libglib2 host-pkgconf
 +
 +$(eval $(cmake-package))
-+
 diff --git a/package/ad9361/Config.in b/package/ad9361/Config.in
 new file mode 100755
 index 0000000000..ba421628ee
 --- /dev/null
 +++ b/package/ad9361/Config.in
-@@ -0,0 +1,7 @@
+@@ -0,0 +1,6 @@
 +config BR2_PACKAGE_AD9361
 +        bool "ad9361"
 +        help
 +          This is a comment that explains what ad9361 is.
 +
 +          https://github.com/analogdevicesinc/libad9361-iio
-+
 diff --git a/package/ad9361/ad9361.mk b/package/ad9361/ad9361.mk
 new file mode 100755
 index 0000000000..243a395714
@@ -429,25 +426,25 @@ index 0000000000..d93b41830d
 +-DIRS ?= .
 ++LDFLAGS += -lliquid -liio -lad9361 -lc -lm -lfftw3 -lfftw3f -lini -lusb-1.0 \
 ++-lserialport -lavahi-client -lavahi-common -lxml2 -lz -ldbus-1 -lfec -ltuntap
-+ 
++
 +-ARCH=arm
 +-VIVADO_SETTINGS ?= /opt/Xilinx/Vivado/2016.4/settings64.sh
 +-HAVE_VIVADO= $(shell bash -c "source $(VIVADO_SETTINGS) > /dev/null 2>&1 && vivado -version > /dev/null 2>&1 && echo 1 || echo 0")
 ++SRC := $(wildcard *.c)
 ++OBJ := $(addprefix build/,$(SRC:.c=.o))
-+ 
++
 +-FLAGS ?= -O3 -std=c99 -I../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/usr/include/\
 +-         --sysroot=../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/\
 +-        -I./third_party/libtuntap/
 ++bin/charon: $(OBJ)
 ++	@mkdir -p $(@D)
 ++	@$(CC) $(CXXFLAGS) $(CFLAGS) $^ $(LDFLAGS) -o $@
-+ 
++
 +-SYSROOT ?= ../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/
 ++build/%.o: %.c
 ++	@mkdir -p $(@D)
 ++	@$(CC) $(CXXFLAGS) $(CFLAGS) -MMD -MP -fPIC -c $< -o $@
-+ 
++
 +-LDFLAGS ?= --sysroot=/opt/Xilinx/SDK/2016.4/gnu/arm/lin/arm-xilinx-linux-gnueabi/libc\
 +-           -L ../buildroot/output/host/arm-buildroot-linux-gnueabi/sysroot/\
 +-           -L /opt/Xilinx/SDK/2016.4/gnu/arm/lin/arm-xilinx-linux-gnueabi/libc\
@@ -508,7 +505,7 @@ index 0000000000..d93b41830d
 + clean:
 +-	@$(RM) -r $(OUT) $(OUT_DIR)
 ++	@rm -rf build bin
-+ 
++
 +--include: $(DEPS)
 ++-include: $(OBJ:.o=.d)
 +diff --git a/pluto.c b/pluto.c
@@ -762,7 +759,7 @@ new file mode 100755
 index 0000000000..6e1079cecf
 --- /dev/null
 +++ b/package/csdr/csdr.mk
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,31 @@
 +################################################################################
 +#
 +# csdr
@@ -794,7 +791,6 @@ index 0000000000..6e1079cecf
 +
 +
 +$(eval $(generic-package))
-+
 diff --git a/package/dump1090-pluto/Config.in b/package/dump1090-pluto/Config.in
 new file mode 100755
 index 0000000000..b3e36dabcf
@@ -887,7 +883,7 @@ new file mode 100644
 index 0000000000..c8c8308c2b
 --- /dev/null
 +++ b/package/dvb2iq/dvb2iq.mk
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,25 @@
 +################################################################################
 +#
 +# DVB2IQ
@@ -913,7 +909,6 @@ index 0000000000..c8c8308c2b
 +#endef
 +
 +$(eval $(generic-package))
-+
 diff --git a/package/gnuradio/0002-boost_qualify_placeholders_with_their_full_namespace.patch b/package/gnuradio/0002-boost_qualify_placeholders_with_their_full_namespace.patch
 index 4f3d892125..305a3a8a9f 100644
 --- a/package/gnuradio/0002-boost_qualify_placeholders_with_their_full_namespace.patch
@@ -945,17 +940,16 @@ new file mode 100644
 index 0000000000..342ccf6aba
 --- /dev/null
 +++ b/package/gnuradio/0005-force_neonv7.patch
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,9 @@
 +--- ./volk/lib/CMakeLists.txt	2020-08-21 20:58:10.000000000 +0200
 ++++ ./volk/lib/CMakeLists.txt	2022-07-18 15:05:45.353048746 +0200
 +@@ -259,6 +259,7 @@
-+ 
++
 + include(CheckCSourceCompiles)
-+ 
++
 ++set(have_neonv7_result 1)
 + check_c_source_compiles("#include <arm_neon.h>\nint main(){ uint8_t *dest; uint8x8_t res; vst1_u8(dest, res); }"
-+ 	                neon_compile_result)
-+ 
++                       neon_compile_result)
 diff --git a/package/gnuradio/gnuradio.hash b/package/gnuradio/gnuradio.hash
 index 2f147761d8..e47c5faaba 100644
 --- a/package/gnuradio/gnuradio.hash
@@ -978,11 +972,6 @@ index 10402da49f..58ed47af21 100644
  GNURADIO_SITE = https://github.com/gnuradio/gnuradio/releases/download/v$(GNURADIO_VERSION)
  GNURADIO_LICENSE = GPL-3.0+
  GNURADIO_LICENSE_FILES = COPYING
-@@ -167,3 +167,4 @@ GNURADIO_CONF_OPTS += -DENABLE_GR_ZEROMQ=OFF
- endif
- 
- $(eval $(cmake-package))
-+
 diff --git a/package/libdvbmod/Config.in b/package/libdvbmod/Config.in
 new file mode 100644
 index 0000000000..79b6cb08cf
@@ -1119,7 +1108,7 @@ index 0000000000..fc5b6f1df0
 + set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 +-set(CMAKE_INSTALL_PREFIX "/usr/local/")
 + set(${CMAKE_SYSTEM_NAME} True)
-+ 
++
 + # Global CPP definitions
 +@@ -36,18 +35,10 @@ set(SOURCES_LIST
 + # OS families specific things
@@ -1132,11 +1121,11 @@ index 0000000000..fc5b6f1df0
 +-        /usr/include/
 +-        /usr/local/include
 +-    )
-+-    
++-
 +     # Unix specific definitions
 +     # -------------------------
 +     add_definitions(-DUnix)
-+-    
++-
 ++
 +     # Unix specific source files
 +     # --------------------------
@@ -1145,7 +1134,7 @@ index 0000000000..fc5b6f1df0
 +     # Windows specific definitions
 +     # ----------------------------
 +     add_definitions(-DWindows)
-+-    
++-
 ++
 +     # Windows specific source files
 +     # -----------------------------
@@ -1198,18 +1187,16 @@ new file mode 100755
 index 0000000000..ea9e63dfc2
 --- /dev/null
 +++ b/package/luaradio-basic/Config.in
-@@ -0,0 +1,11 @@
+@@ -0,0 +1,9 @@
 +config BR2_PACKAGE_LUARADIO_BASIC
 +        bool "luaradio-basic"
 +       select BR2_PACKAGE_LUAJIT
 +
 +        help
-+         A lightweight, embeddable software-defined radio framework built on LuaJIT 
++         A lightweight, embeddable software-defined radio framework built on LuaJIT
 +
 +
 +	  http://luaradio.io
-+
-+ 
 diff --git a/package/luaradio-basic/Makefile b/package/luaradio-basic/Makefile
 new file mode 100755
 index 0000000000..cbdd1ae8cf
@@ -1397,7 +1384,7 @@ new file mode 100755
 index 0000000000..ce44fa435e
 --- /dev/null
 +++ b/package/luaradio-basic/luaradio-basic.mk
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,42 @@
 +################################################################################
 +#
 +#LUARADIO
@@ -1440,7 +1427,6 @@ index 0000000000..ce44fa435e
 +        $(INSTALL) -D -m 755 $(@D)/luaradio $(TARGET_DIR)/root/luaradio/luaradio
 +
 +endef
-+
 diff --git a/package/luaradio-basic/readme.patch.txt b/package/luaradio-basic/readme.patch.txt
 new file mode 100755
 index 0000000000..c22e91cc33
@@ -1622,7 +1608,7 @@ index 0000000000..7ee4866b21
 +	bool "multimonng"
 +	help
 +	  HAMRADIO : multimon-ng decodes the following digital transmission modes:
-+          POCSAG512 POCSAG1200 POCSAG2400 FLEX EAS UFSK1200 CLIPFSK 
++          POCSAG512 POCSAG1200 POCSAG2400 FLEX EAS UFSK1200 CLIPFSK
 +          AFSK1200 AFSK2400 AFSK2400_2 AFSK2400_3 HAPN4800 FSK9600 DTMF
 +          ZVEI1 ZVEI2 ZVEI3 DZVEI PZVEI EEA EIA CCIR MORSE CW X10
 +
@@ -1639,7 +1625,7 @@ new file mode 100755
 index 0000000000..23f0ee1169
 --- /dev/null
 +++ b/package/multimonng/multimonng.mk
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,22 @@
 +################################################################################
 +#
 +# MULTIMONNG
@@ -1655,15 +1641,13 @@ index 0000000000..23f0ee1169
 +MULTIMONNG_INSTALL_STAGING = YES
 +MULTIMONNG_LICENSE = GPL-2.0
 +MULTIMONNG_LICENSE_FILES = COPYING
-+#MULTIMONNG_DEPENDENCIES = 
++#MULTIMONNG_DEPENDENCIES =
 +#MULTIMONNG_SITE_METHOD = git
 +
 +
 +
 +
 +$(eval $(cmake-package))
-+
-+
 diff --git a/package/python3/0001-Make-the-build-of-pyc-files-conditional.patch b/package/python3/0001-Make-the-build-of-pyc-files-conditional.patch
 index 44902725d7..d3b5368903 100644
 --- a/package/python3/0001-Make-the-build-of-pyc-files-conditional.patch
@@ -3422,14 +3406,13 @@ new file mode 100755
 index 0000000000..af70e3d3d1
 --- /dev/null
 +++ b/package/retrogram-plutosdr/Config.in
-@@ -0,0 +1,7 @@
+@@ -0,0 +1,6 @@
 +config BR2_PACKAGE_RETROGRAM
 +        bool "retrogram-plutosdr"
 +        help
 +          This is a comment that explains what retrogram is.
 +
 +          https://github.com/r4d10n/retrogram-plutosdr
-+
 diff --git a/package/retrogram-plutosdr/retrogram-plutosdr.mk b/package/retrogram-plutosdr/retrogram-plutosdr.mk
 new file mode 100755
 index 0000000000..85029e712c
@@ -3463,7 +3446,7 @@ index 0000000000..72e88831db
 +        depends on BR2_TOOLCHAIN_HAS_THREADS
 +        depends on BR2_PACKAGE_SOAPYSDR
 +        help
-+          Program to decode traffic from Devices that are broadcasting on 433.9 MHz like temperature sensors 
++          Program to decode traffic from Devices that are broadcasting on 433.9 MHz like temperature sensors
 +
 +          https://github.com/merbanan/rtl_433
 +comment "rtl_433 needs a toolchain w/ threads"
@@ -3491,7 +3474,7 @@ index 0000000000..ff77a46144
 +RTL_433_LICENSE := GPL-2.0
 +RTL_433_LICENSE_FILES :=  COPYING
 +#RTL_433_DEPENDENCIES +=  soapysdr
-+RTL_433_CONF_OPTS := -DENABLE_SOAPYSDR=ON -DENABLE_RTLSDR=OFF 
++RTL_433_CONF_OPTS := -DENABLE_SOAPYSDR=ON -DENABLE_RTLSDR=OFF
 +-DCFLAGS=$(TARGET_CC) -DCXXFLAGS=$(TARGET_CXX)
 +
 +$(eval $(cmake-package))
@@ -3506,7 +3489,7 @@ index 0000000000..a3f3d460af
 +        depends on BR2_TOOLCHAIN_HAS_THREADS
 +        depends on BR2_PACKAGE_SOAPYSDR
 +        help
-+          RTLSDR-Airband receives analog radio voice channels and produces audio streams which can be routed to various outputs, such as online streaming services like LiveATC.net.  
++          RTLSDR-Airband receives analog radio voice channels and produces audio streams which can be routed to various outputs, such as online streaming services like LiveATC.net.
 +
 +          https://github.com/szpajder/RTLSDR-Airband
 +comment "RTLSDR_Airband needs a toolchain w/ threads"
@@ -3544,7 +3527,7 @@ new file mode 100644
 index 0000000000..57efcc7f79
 --- /dev/null
 +++ b/package/rxtools/Config.in
-@@ -0,0 +1,11 @@
+@@ -0,0 +1,10 @@
 +config BR2_PACKAGE_RXTOOLS
 +        bool "rxtools"
 +        depends on BR2_TOOLCHAIN_HAS_THREADS
@@ -3555,7 +3538,6 @@ index 0000000000..57efcc7f79
 +          https://github.com/rxseger/rx_tools
 +comment "rxtools needs a toolchain w/ threads"
 +        depends on !BR2_TOOLCHAIN_HAS_THREADS
-+
 diff --git a/package/rxtools/rxtools.mk b/package/rxtools/rxtools.mk
 new file mode 100644
 index 0000000000..59082bc75d
@@ -3631,7 +3613,7 @@ index 0000000000..0717864f3f
 +SIGUTILS_INSTALL_STAGING = YES
 +SIGUTILS_LICENSE = GPL-2.0
 +#SIGUTILS_LICENSE_FILES =  COPYING
-+SIGUTILS_DEPENDENCIES +=  
++SIGUTILS_DEPENDENCIES +=
 +
 +
 +$(eval $(cmake-package))
@@ -3640,14 +3622,13 @@ new file mode 100755
 index 0000000000..6a095b7b6c
 --- /dev/null
 +++ b/package/soapysdr/Config.in
-@@ -0,0 +1,7 @@
+@@ -0,0 +1,6 @@
 +config BR2_PACKAGE_SOAPYSDR
 +        bool "soapysdr"
 +        help
 +          This is a comment that explains what soapysdr is.
 +
 +          https://github.com/pothosware/SoapySDR
-+
 diff --git a/package/soapysdr/soapysdr.mk b/package/soapysdr/soapysdr.mk
 new file mode 100755
 index 0000000000..cd1c6f8cb5
@@ -3693,7 +3674,7 @@ index 0000000000..4866d3ca88
 +        depends on BR2_TOOLCHAIN_HAS_THREADS
 +#        depends on BR2_PACKAGE_SNDFILE
 +        help
-+          Suscan is a realtime DSP processing library. It provides a set of useful abstractions to perform dynamic digital signal analysis and demodulation. 
++          Suscan is a realtime DSP processing library. It provides a set of useful abstractions to perform dynamic digital signal analysis and demodulation.
 +
 +          https://github.com/BatchDrake/suscan
 +comment "sigutils needs a toolchain w/ threads"
@@ -3724,7 +3705,7 @@ index 0000000000..8196d74f32
 +SUSCAN_INSTALL_STAGING = YES
 +SUSCAN_LICENSE = GPL-2.0
 +#SUSCAN_LICENSE_FILES = LICENSE
-+SUSCAN_DEPENDENCIES +=  
++SUSCAN_DEPENDENCIES +=
 +
 +
 +$(eval $(cmake-package))
@@ -3739,7 +3720,7 @@ index 0000000000..d3194205f8
 +        depends on BR2_TOOLCHAIN_HAS_THREADS
 +        depends on BR2_PACKAGE_SOAPYSDR
 +        help
-+          tx_sdr tool for transmitting data to SDRs, based on rtl_sdr from librtlsdr, and rx_sdr from rx_tools, using the SoapySDR vendor-neutral SDR support library, intended to support a wide range of TX-capable devices. 
++          tx_sdr tool for transmitting data to SDRs, based on rtl_sdr from librtlsdr, and rx_sdr from rx_tools, using the SoapySDR vendor-neutral SDR support library, intended to support a wide range of TX-capable devices.
 +
 +          https://github.com/triq-org/tx_tools
 +comment "tx_tools needs a toolchain w/ threads"
