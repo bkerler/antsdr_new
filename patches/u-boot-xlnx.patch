@@ -218,13 +218,13 @@ diff -u b/arch/arm/dts/zynq-ant-sdr.dts b/arch/arm/dts/zynq-ant-sdr.dts
 +		};
 +
 +	};
-+	
-+	
++
++
  };
  
 +
 +
-+	
++
 +
 +
  &qspi {
@@ -245,7 +245,7 @@ diff -u b/arch/arm/dts/zynq-ant-sdr.dts b/arch/arm/dts/zynq-ant-sdr.dts
 +&sdhci0 {
 +	u-boot,dm-pre-reloc;
 +	status = "okay";
-+	
++
 +};
 +
 +&gem0 {
