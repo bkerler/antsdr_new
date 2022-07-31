@@ -255,7 +255,7 @@ new file mode 100644
 index 0000000000..60c46ef066
 --- /dev/null
 +++ b/board/ant/S23udc
-@@ -0,0 +1,156 @@
+@@ -0,0 +1,150 @@
 +#!/bin/sh
 +
 +source /etc/device_config
@@ -406,18 +406,13 @@ index 0000000000..60c46ef066
 +esac
 +
 +exit $?
-+
-+
-+
-+
-+
-+
+
 diff --git a/board/ant/S40network b/board/ant/S40network
 new file mode 100644
 index 0000000000..eb07a4be92
 --- /dev/null
 +++ b/board/ant/S40network
-@@ -0,0 +1,143 @@
+@@ -0,0 +1,142 @@
 +#!/bin/sh
 +#
 +# Start the network....
@@ -560,7 +555,6 @@ index 0000000000..eb07a4be92
 +esac
 +
 +exit $?
-+
 diff --git a/board/ant/S41network b/board/ant/S41network
 new file mode 100644
 index 0000000000..78433a60d7
@@ -1884,7 +1878,7 @@ new file mode 100644
 index 0000000000..c241bf90a0
 --- /dev/null
 +++ b/board/ant/device_config
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,14 @@
 +#S23udc
 +PRODUCT="PlutoSDR (ADALM-PLUTO)"
 +USBPID=0xb673
@@ -1899,7 +1893,6 @@ index 0000000000..c241bf90a0
 +TARGET=plutosdr
 +FIRMWARE=/mnt/msd/ant.frm
 +FRM_MAGIC="ITB PlutoSDR (ADALM-PLUTO)"
-+
 diff --git a/board/ant/device_format_jffs2 b/board/ant/device_format_jffs2
 new file mode 100644
 index 0000000000..7ffac180d3
@@ -2010,7 +2003,7 @@ new file mode 100644
 index 0000000000..71872e8596
 --- /dev/null
 +++ b/board/ant/genimage-msd.cfg
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,18 @@
 +image boot.vfat {
 +  vfat {
 +   extraargs = "-n PlutoSDR"
@@ -2029,8 +2022,6 @@ index 0000000000..71872e8596
 +    image = "boot.vfat"
 +  }
 +}
-+
-+
 diff --git a/board/ant/ifupdown.sh b/board/ant/ifupdown.sh
 new file mode 100644
 index 0000000000..0e75ce188d
@@ -2427,7 +2418,7 @@ new file mode 100644
 index 0000000000..96c1c9a3a1
 --- /dev/null
 +++ b/board/ant/input-event-daemon.conf
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,9 @@
 +#
 +# /etc/input-event-daemon.conf
 +#
@@ -2437,9 +2428,7 @@ index 0000000000..96c1c9a3a1
 +
 +[Keys]
 +BTN_0         = ACTION=remove_all /lib/mdev/automounter.sh
-+
-+
-+
+
 diff --git a/board/ant/mdev.conf b/board/ant/mdev.conf
 new file mode 100644
 index 0000000000..09ad12fbb8
@@ -7758,7 +7747,7 @@ index 0000000000..d0b42f139f
 +	echo heartbeat > /sys/class/leds/led0:green/trigger
 +}
 +
-+handle_frimware_frm () {
++handle_firmware_frm () {
 +	FILE="$1"
 +	MAGIC="$2"
 +	md5=`tail -c 33 ${FILE}`
@@ -7784,7 +7773,7 @@ index 0000000000..d0b42f139f
 +
 +if [[ -f ${FRM_FILE} ]] && [[ ${FRM_FILE: -4} == ".frm" ]] && [[ -s ${FRM_FILE} ]]
 +then
-+	handle_frimware_frm "${FRM_FILE}" "${FRM_MAGIC}"
++	handle_firmware_frm "${FRM_FILE}" "${FRM_MAGIC}"
 +else
 +	echo "Failed"
 +	exit 1
@@ -8877,7 +8866,7 @@ index 0000000000..2c5b0608ce
 +# This file is provided by the wpasupplicant package.
 +
 +#####################################################################
-+# Copyright (C) 2006 - 2009 Debian/Ubuntu wpasupplicant Maintainers 
++# Copyright (C) 2006 - 2009 Debian/Ubuntu wpasupplicant Maintainers
 +# <pkg-wpa-devel@lists.alioth.debian.org>
 +#
 +# This program is free software; you can redistribute it and/or
@@ -8966,7 +8955,7 @@ index 0000000000..2c5b0608ce
 +		if [ ! -s "$IF_WPA_CONF" ]; then
 +			wpa_msg stderr "cannot read contents of $IF_WPA_CONF"
 +			exit 1
-+		fi	
++		fi
 +		WPA_SUP_CONF_CTRL_DIR=$(sed -n -e 's/[[:space:]]*#.*//g' -e 's/[[:space:]]\+.*$//g' \
 +			-e 's/^ctrl_interface=\(DIR=\)\?\(.*\)/\2/p' "$IF_WPA_CONF")
 +		if [ -n "$WPA_SUP_CONF_CTRL_DIR" ]; then
@@ -8997,7 +8986,7 @@ index 0000000000..2c5b0608ce
 +	fi
 +}
 +
-+case "$MODE" in 
++case "$MODE" in
 +	start)
 +		do_start
 +		case "$PHASE" in
@@ -9027,7 +9016,7 @@ index 0000000000..2c5b0608ce
 +				;;
 +		esac
 +		;;
-+	
++
 +	*)
 +		wpa_msg stderr "unknown mode: \"$MODE\""
 +		exit 1
@@ -9513,12 +9502,12 @@ index a3b3f6f664..8d10b7db39 100644
 -| |   | | |_| | || (_) /\__/ / |/ /| |\ \
 -\_|   |_|\__,_|\__\___/\____/|___/ \_| \_|
 -
-+    ___    _   _____________ ____  ____ 
++    ___    _   _____________ ____  ____
 +   /   |  / | / /_  __/ ___// __ \/ __ \
 +  / /| | /  |/ / / /  \__ \/ / / / /_/ /
-+ / ___ |/ /|  / / /  ___/ / /_/ / _, _/ 
-+/_/  |_/_/ |_/ /_/  /____/_____/_/ |_|  
-+                                       
++ / ___ |/ /|  / / /  ___/ / /_/ / _, _/
++/_/  |_/_/ |_/ /_/  /____/_____/_/ |_|
++
  #BUILD#
 -https://wiki.analog.com/university/tools/pluto
 +https://github.com/MicroPhase/antsdr-fw
