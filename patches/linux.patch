@@ -211,7 +211,7 @@ index 0000000000000..e4a140524acb2
 +
 +/ {
 +	model = "Analog Devices PlutoSDR Rev.C (Z7010/AD9363)";
-+	
++
 +	leds {
 +		compatible = "gpio-leds";
 +		led0 {
@@ -1004,7 +1004,7 @@ index 64178ec31fe80..e784bca16fb0b 100644
  EXPORT_SYMBOL(ad9361_bist_loopback);
  
 -int ad9361_write_bist_reg(struct ad9361_rf_phy *phy, u32 val)
-+int ad9361_write_bist_reg(struct ad9361_rf_phy *phy, u32 val) 
++int ad9361_write_bist_reg(struct ad9361_rf_phy *phy, u32 val)
  {
  	if (!phy || !phy->state)
  		return -EINVAL;
@@ -1054,7 +1054,7 @@ index 64178ec31fe80..e784bca16fb0b 100644
  	u8  i;
  	int ret;
 -
-+	
++
  	lo_freq_hz = ad9361_from_clk(clk_get_rate(phy->clks[RX_RFPLL]));
  	if (lo_freq_hz < 1300000000ULL)
  		lo_index = 0;
@@ -1063,7 +1063,7 @@ index 64178ec31fe80..e784bca16fb0b 100644
  	clk_set_parent(phy->clks[TX_RFPLL], phy->clks[TX_RFPLL_INT]);
  	clk_set_parent(phy->clks[RX_RFPLL], phy->clks[RX_RFPLL_INT]);
 -
-+	
++
  	ret = clk_set_rate(phy->clks[RX_REFCLK], ref_freq);
  	if (ret < 0) {
  		dev_err(dev, "Failed to set RX Synth ref clock rate (%d)\n", ret);
@@ -1087,7 +1087,7 @@ index 64178ec31fe80..e784bca16fb0b 100644
  
  		ad9361_set_trx_clock_chain(phy, st->current_rx_path_clks, st->current_tx_path_clks);
  		clk_set_rate(phy->clks[RX_RFPLL], rx);
-+		
++
  		clk_set_rate(phy->clks[TX_RFPLL], tx);
  		break;
  	}
@@ -1118,7 +1118,7 @@ index 64178ec31fe80..e784bca16fb0b 100644
 +					gpiod_set_value_cansleep(phy->pdata->VCRX1_2_gpio, 1);
 +					gpiod_set_value_cansleep(phy->pdata->VCRX2_1_gpio, 1);
 +					}
-+				
++
 +/******************************切换滤波器频段**********************************/
  			break;
  		case 1:
@@ -1252,7 +1252,7 @@ index 4e2e6bca85b89..4ae57b1e9435a 100644
  / {
  	model = "Analog Devices PlutoSDR Rev.A (Z7010/AD9363)";
  	memory {
-@@ -436,13 +440,61 @@
+@@ -436,13 +440,60 @@
  
  		en_agc-gpios = <&gpio0 66 0>;
  		reset-gpios = <&gpio0 67 0>;
@@ -1321,7 +1321,6 @@ index 4e2e6bca85b89..4ae57b1e9435a 100644
 +		};
  	};
  };
-+
 diff --git a/arch/arm/configs/zynq_ant_defconfig b/arch/arm/configs/zynq_ant_defconfig
 index ec4dc278c3c8c..79bef8c8c9dc2 100644
 --- a/arch/arm/configs/zynq_ant_defconfig
