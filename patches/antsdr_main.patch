@@ -1,36 +1,3 @@
-diff --git a/Makefile b/Makefile
-index 303b2f7..9b3d683 100644
---- a/Makefile
-+++ b/Makefile
-@@ -23,7 +23,7 @@ VSUBDIRS = hdl buildroot linux u-boot-xlnx
- 
- VERSION=$(shell git describe --abbrev=4 --dirty --always --tags)
- LATEST_TAG=$(shell git describe --abbrev=0 --tags)
--UBOOT_VERSION=$(shell echo -n "PlutoSDR " && cd u-boot-xlnx && git describe --abbrev=0 --dirty --always --tags)
-+UBOOT_VERSION=$(shell echo -n "ANTSDR " && cd u-boot-xlnx && git describe --abbrev=0 --dirty --always --tags)
- HAVE_VIVADO= $(shell bash -c "source $(VIVADO_SETTINGS) > /dev/null 2>&1 && vivado -version > /dev/null 2>&1 && echo 1 || echo 0")
- XSA_URL ?= http://github.com/analogdevicesinc/plutosdr-fw/releases/download/${LATEST_TAG}/system_top.xsa
- 
-@@ -38,8 +38,8 @@ $(error "      3] export VIVADO_VERSION=v20xx.x")
- 	endif
- endif
- 
--TARGET ?= pluto
--SUPPORTED_TARGETS:=pluto sidekiqz2
-+TARGET ?= ant
-+SUPPORTED_TARGETS:=pluto sidekiqz2 ant
- 
- # Include target specific constants
- include scripts/$(TARGET).mk
-@@ -59,7 +59,7 @@ endif
- 
- ifeq ($(findstring $(TARGET),$(SUPPORTED_TARGETS)),)
- all:
--	@echo "Invalid `TARGET variable ; valid values are: pluto, sidekiqz2" &&
-+	@echo "Invalid `TARGET variable ; valid values are: pluto, sidekiqz2,ant" &&
- 	exit 1
- else
- all: clean-build $(TARGETS) zip-all legal-info
 diff --git a/scripts/ant.its b/scripts/ant.its
 new file mode 100644
 index 0000000..177ddf6
@@ -216,7 +183,7 @@ new file mode 100644
 index 0000000..8aabd9b
 --- /dev/null
 +++ b/scripts/ant.mk
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,9 @@
 +
 +# Target specific constants go here
 +
@@ -226,4 +193,95 @@ index 0000000..8aabd9b
 +ZIP_ARCHIVE_PREFIX:=antsdr
 +DEVICE_VID:=0x0456
 +DEVICE_PID:=0xb673
+diff --git a/Makefile b/Makefile
+index 303b2f7..92310c7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -23,7 +23,7 @@ VSUBDIRS = hdl buildroot linux u-boot-xlnx
+ 
+ VERSION=$(shell git describe --abbrev=4 --dirty --always --tags)
+ LATEST_TAG=$(shell git describe --abbrev=0 --tags)
+-UBOOT_VERSION=$(shell echo -n "PlutoSDR " && cd u-boot-xlnx && git describe --abbrev=0 --dirty --always --tags)
++UBOOT_VERSION=$(shell echo -n "ANTSDR " && cd u-boot-xlnx && git describe --abbrev=0 --dirty --always --tags)
+ HAVE_VIVADO= $(shell bash -c "source $(VIVADO_SETTINGS) > /dev/null 2>&1 && vivado -version > /dev/null 2>&1 && echo 1 || echo 0")
+ XSA_URL ?= http://github.com/analogdevicesinc/plutosdr-fw/releases/download/${LATEST_TAG}/system_top.xsa
+ 
+@@ -38,8 +38,8 @@ $(error "      3] export VIVADO_VERSION=v20xx.x")
+ 	endif
+ endif
+ 
+-TARGET ?= pluto
+-SUPPORTED_TARGETS:=pluto sidekiqz2
++TARGET ?= ant
++SUPPORTED_TARGETS:=pluto sidekiqz2 ant
+ 
+ # Include target specific constants
+ include scripts/$(TARGET).mk
+@@ -59,7 +59,7 @@ endif
+ 
+ ifeq ($(findstring $(TARGET),$(SUPPORTED_TARGETS)),)
+ all:
+-	@echo "Invalid `TARGET variable ; valid values are: pluto, sidekiqz2" &&
++	@echo "Invalid `TARGET variable ; valid values are: pluto, sidekiqz2,ant" &&
+ 	exit 1
+ else
+ all: clean-build $(TARGETS) zip-all legal-info
+@@ -96,14 +96,19 @@ build/uboot-env.bin: build/uboot-env.txt
+ 
+ linux/arch/arm/boot/zImage:
+ 	make -C linux ARCH=arm zynq_$(TARGET)_defconfig
++	make -C linux -j $(NCORES) ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) uImage UIMAGE_LOADADDR=0x8000
+ 	make -C linux -j $(NCORES) ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) zImage UIMAGE_LOADADDR=0x8000
+ 
+ .PHONY: linux/arch/arm/boot/zImage
++.PHONY: linux/arch/arm/boot/uImage
+ 
+ 
+ build/zImage: linux/arch/arm/boot/zImage  | build
+ 	cp $< $@
+ 
++build/uImage: linux/arch/arm/boot/uImage  | build
++	cp $< $@
 +
+ ### Device Tree ###
+ 
+ linux/arch/arm/boot/dts/%.dtb: linux/arch/arm/boot/dts/%.dts  linux/arch/arm/boot/dts/zynq-pluto-sdr.dtsi
+@@ -179,6 +184,7 @@ build/$(TARGET).dfu: build/$(TARGET).itb
+ clean-build:
+ 	rm -f $(notdir $(wildcard build/*))
+ 	rm -rf build/*
++	rm -rf build_sdimg/*
+ 
+ clean:
+ 	make -C u-boot-xlnx clean
+@@ -187,6 +193,29 @@ clean:
+ 	make -C hdl clean
+ 	rm -f $(notdir $(wildcard build/*))
+ 	rm -rf build/*
++	rm -rf build_sdimg/*
++
++SDIMGDIR = $(CURDIR)/build_sdimg
++sdimg: build/
++	mkdir $(SDIMGDIR)
++	cp build/sdk/fsbl/Release/fsbl.elf 	$(SDIMGDIR)/fsbl.elf
++	cp build/sdk/hw_0/system_top.bit 	$(SDIMGDIR)/system_top.bit
++	cp build/u-boot.elf 			$(SDIMGDIR)/u-boot.elf
++	cp $(CURDIR)/linux/arch/arm/boot/uImage	$(SDIMGDIR)/uImage
++	cp build/zynq-$(TARGET)-sdr.dtb 	$(SDIMGDIR)/devicetree.dtb
++	cp build/uboot-env.txt  		$(SDIMGDIR)/uEnv.txt
++	cp build/rootfs.cpio.gz  		$(SDIMGDIR)/ramdisk.image.gz
++	mkimage -A arm -T ramdisk -C gzip -d $(SDIMGDIR)/ramdisk.image.gz $(SDIMGDIR)/uramdisk.image.gz
++	touch 	$(SDIMGDIR)/boot.bif
++	echo "image : {[bootloader] $(SDIMGDIR)/fsbl.elf  $(SDIMGDIR)/system_top.bit  $(SDIMGDIR)/u-boot.elf}" >  $(SDIMGDIR)/boot.bif
++	bash -c "source $(VIVADO_SETTINGS) && bootgen -image $(SDIMGDIR)/boot.bif -o i $(SDIMGDIR)/BOOT.bin"
++	rm $(SDIMGDIR)/fsbl.elf
++	rm $(SDIMGDIR)/system_top.bit
++	rm $(SDIMGDIR)/u-boot.elf
++	rm $(SDIMGDIR)/ramdisk.image.gz
++	rm $(SDIMGDIR)/boot.bif
++
++
+ 
+ zip-all: $(TARGETS)
+ 	zip -j build/$(ZIP_ARCHIVE_PREFIX)-fw-$(VERSION).zip $^
+
