@@ -194,18 +194,21 @@ index 0000000..8aabd9b
 +DEVICE_VID:=0x0456
 +DEVICE_PID:=0xb673
 diff --git a/Makefile b/Makefile
-index 303b2f7..92310c7 100644
+index 303b2f7..4db4f54 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -23,7 +23,7 @@ VSUBDIRS = hdl buildroot linux u-boot-xlnx
+@@ -23,9 +23,9 @@ VSUBDIRS = hdl buildroot linux u-boot-xlnx
  
  VERSION=$(shell git describe --abbrev=4 --dirty --always --tags)
  LATEST_TAG=$(shell git describe --abbrev=0 --tags)
 -UBOOT_VERSION=$(shell echo -n "PlutoSDR " && cd u-boot-xlnx && git describe --abbrev=0 --dirty --always --tags)
 +UBOOT_VERSION=$(shell echo -n "ANTSDR " && cd u-boot-xlnx && git describe --abbrev=0 --dirty --always --tags)
  HAVE_VIVADO= $(shell bash -c "source $(VIVADO_SETTINGS) > /dev/null 2>&1 && vivado -version > /dev/null 2>&1 && echo 1 || echo 0")
- XSA_URL ?= http://github.com/analogdevicesinc/plutosdr-fw/releases/download/${LATEST_TAG}/system_top.xsa
+-XSA_URL ?= http://github.com/analogdevicesinc/plutosdr-fw/releases/download/${LATEST_TAG}/system_top.xsa
++#XSA_URL ?= http://github.com/analogdevicesinc/plutosdr-fw/releases/download/${LATEST_TAG}/system_top.xsa
  
+ ifeq (1, ${HAVE_VIVADO})
+ 	VIVADO_INSTALL= $(shell bash -c "source $(VIVADO_SETTINGS) > /dev/null 2>&1 && vivado -version | head -1 | awk '{print $2}'")
 @@ -38,8 +38,8 @@ $(error "      3] export VIVADO_VERSION=v20xx.x")
  	endif
  endif
@@ -284,5 +287,3 @@ index 303b2f7..92310c7 100644
  
  zip-all: $(TARGETS)
  	zip -j build/$(ZIP_ARCHIVE_PREFIX)-fw-$(VERSION).zip $^
-
-
