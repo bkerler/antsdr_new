@@ -277,7 +277,9 @@ unchanged:
  CONFIG_CMD_SF=y
  CONFIG_CMD_SPI=y
  CONFIG_CMD_USB=y
---- b/include/configs/zynq-common.h
+diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
+index fd50caf450..f900364a9c 100644
+--- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -270,57 +270,54 @@
  		"fi; \0" \
@@ -366,6 +368,15 @@ unchanged:
  		"fi; \0" \
  	"qspiboot_extraenv=sf read ${extraenv_load_address} 0xFF000 0x1000 && " \
  		"env import -c ${extraenv_load_address} 0x1000 || true \0" \
+@@ -342,7 +339,7 @@
+ 		"fi; " \
+ 		"envversion;setenv bootargs console=ttyPS0,115200 maxcpus=${maxcpus} rootfstype=ramfs root=/dev/ram0 rw earlyprintk clk_ignore_unused uboot=\"${uboot-version}\" && " \
+ 		"bootm ${fit_load_address}#${fit_config} || echo BOOT failed entering DFU mode ... && run dfu_sf \0" \
+-	"qspiboot=set stdout nulldev;adi_hwref;test -n $PlutoRevA || gpio input 14 && set stdout serial@e0001000 && sf probe && sf protect lock 0 100000 && run dfu_sf;  " \
++	"qspiboot=set stdout nulldev;run read_sf;adi_hwref;test -n $PlutoRevA || gpio input 14 && set stdout serial@e0001000 && sf probe && sf protect lock 0 100000 && run dfu_sf;  " \
+ 		"set stdout serial@e0001000;" \
+ 		"itest *f8000258 == 480003 && run clear_reset_cause && run dfu_sf; " \
+ 		"itest *f8000258 == 480007 && run clear_reset_cause && run ramboot_verbose; " \
 @@ -362,6 +359,14 @@
  			"echo Running uenvcmd ...; " \
  			"run uenvcmd; " \
@@ -381,4 +392,3 @@ unchanged:
  	"usbboot=if usb start; then " \
  			"run uenvboot; " \
  			"echo Copying Linux from USB to RAM... && " \
-

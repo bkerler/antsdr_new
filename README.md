@@ -331,4 +331,30 @@ The easiest way to make ANTSDR running FMCOMMS2/3/4 image could follow these ste
 
     root@analog:~#
     ```
-- Now you can use a ethernet cable connect to ANTSDR, and add ANTSDR to your software,such as Matlab2020.b and GNU Radio. With this image, ANTSDR could support 2r2t mode.
+- Now you can use a ethernet cable connect to ANTSDR, and add ANTSDR to your software,such as Matlab2020.b and GNU Radio. 
+
+
+
+## Support 2r2t mode
+If you want to use 2r2t mode, you need to enter the system and run the following command to write the mode configuradion into the nor flash.
+
+   ```sh
+ fw_setenv attr_name compatible
+ fw_setenv attr_val ad9361
+ fw_setenv compatible ad9361
+ fw_setenv mode 2r2t
+ reboot
+   ```
+
+After restarting, use the command to detect whether the variable in the flash has been written. If the write is successful, then the 2r2t mode can be used.
+
+Of course, thers is another way to configure the 2r2t mode, and use the command to write to the flash under uboot, such as
+
+```sh
+ setenv attr_name compatible
+ setenv attr_val ad9361
+ setenv compatible ad9361
+ setenv mode 2r2t
+ saveenv
+ reset
+ ```
