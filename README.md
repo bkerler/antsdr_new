@@ -53,6 +53,23 @@ If you like to add other stuff like gnuradio and some sdr goodies, then run also
 ./patch_additional.sh
 ```
 
+To use Vitis 2022.1 as external custom toolchain the following steps have to be done:
+
+1. apply a patch to Vitis 2022.1
+```bash
+cd /opt/Xilinx/Vitis/2022.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin
+sudo patch -i 'path to repo'/patches/Vitis2022.1.patch
+```
+
+2. libc.a from a Windows installation of Vitis 2022.1 to /tools/Xilinx/Vitis/2022.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/cortexa9t2hf-neon-xilinx-linux-gnueabi/usr/lib
+
+3. remove the file ld.so.conf like this
+```bash
+cd /opt/Xilinx/Vitis/2022.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/cortexa9t2hf-neon-xilinx-linux-gnueabi/etc
+sudo mv ld.so.conf ld.so.conf.backup
+```
+
+
 - Building
 ```bash
 source ./prepare.sh
