@@ -57,8 +57,11 @@ To use Vitis 2022.1 as external custom toolchain the following steps have to be 
 
 1. apply a patch to Vitis 2022.1
 ```bash
+cd plutosdr-fw/buildroot
+git apply -p1 < ../../patches/Vitis2022.1_Config.patch
 cd /opt/Xilinx/Vitis/2022.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin
 sudo patch -i 'path to repo'/patches/Vitis2022.1.patch
+
 ```
 
 2. libc.a from a Windows installation of Vitis 2022.1 to /tools/Xilinx/Vitis/2022.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/cortexa9t2hf-neon-xilinx-linux-gnueabi/usr/lib
