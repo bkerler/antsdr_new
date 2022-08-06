@@ -1,0 +1,11 @@
+--- a/package/libiio/libiio.mk	2022-08-06 16:51:27.811665313 +0200
++++ b/package/libiio/libiio.mk	2022-08-06 17:02:39.414299992 +0200
+@@ -31,7 +31,7 @@
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBIIO_XML_BACKEND),y)
+-LIBIIO_DEPENDENCIES += libxml2
++LIBIIO_DEPENDENCIES += libxml2 zstd
+ LIBIIO_CONF_OPTS += -DWITH_XML_BACKEND=ON
+ else
+ LIBIIO_CONF_OPTS += -DWITH_XML_BACKEND=OFF
