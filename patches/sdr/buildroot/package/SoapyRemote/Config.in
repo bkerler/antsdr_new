@@ -1,0 +1,10 @@
+config BR2_PACKAGE_SOAPYREMOTE
+        bool "soapyremote"
+        select BR2_PACKAGE_SOAPYSDR
+        help
+          This is a comment that explains what soapysdr is.
+
+          https://github.com/pothosware/SoapyRemote
+
+        comment "soapyremote needs soapysdr"
+                depends on !BR2_PACKAGE_SOAPYSDR

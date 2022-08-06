@@ -2,7 +2,9 @@
 cd plutosdr-fw
 git apply -p1 < ../patches/antsdr_main.patch
 cd buildroot
-git apply -p1 < ../../patches/buildroot.patch
+git checkout -b master-next
+cp -r ../../patches/antsdr/buildroot/* .
+cp -r ../../patches/gr310/buildroot/* .
 cd ../hdl
 git apply -p1 < ../../patches/hdl.patch
 cd ../linux

@@ -1,0 +1,39 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 712443f..a65212a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -19,7 +19,7 @@
+ # -------------------
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+-set(CMAKE_INSTALL_PREFIX "/usr/local/")
++#set(CMAKE_INSTALL_PREFIX "/usr/local/")
+ set(${CMAKE_SYSTEM_NAME} True)
+ 
+ # Global CPP definitions
+@@ -38,11 +38,11 @@
+ if(UNIX)
+     # Unix specific include directories
+     # ---------------------------------
+-    include_directories(
+-        "${CMAKE_CURRENT_SOURCE_DIR}"
+-        /usr/include/
+-        /usr/local/include
+-    )
++    #include_directories(
++    #    "${CMAKE_CURRENT_SOURCE_DIR}"
++    #    /usr/include/
++    #    /usr/local/include
++    #)
+     
+     # Unix specific definitions
+     # -------------------------
+@@ -67,7 +67,7 @@
+ # ------------------
+ if(UNIX)
+     if(Linux)
+-        set(CMAKE_INSTALL_PREFIX "/usr/")
++        #set(CMAKE_INSTALL_PREFIX "/usr/")
+         add_definitions(-D_GNU_SOURCE)
+         set(SOURCES_LIST ${SOURCES_LIST} tuntap-unix-linux.c)
+     elseif (OpenBSD)

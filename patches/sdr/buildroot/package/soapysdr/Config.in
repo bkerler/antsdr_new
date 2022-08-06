@@ -1,0 +1,6 @@
+config BR2_PACKAGE_SOAPYSDR
+        bool "soapysdr"
+        help
+          This is a comment that explains what soapysdr is.
+
+          https://github.com/pothosware/SoapySDR

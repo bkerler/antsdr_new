@@ -1,0 +1,6 @@
+config BR2_PACKAGE_RETROGRAM
+        bool "retrogram-plutosdr"
+        help
+          This is a comment that explains what retrogram is.
+
+          https://github.com/r4d10n/retrogram-plutosdr
