@@ -5,7 +5,7 @@
 ################################################################################
 
 GR_OSMOSDR_VERSION = 821fdb3822b3ad258bdd4be79e5cd3d5964289fb
-GR_OSMOSDR_SITE = https://github.com/osmocom/gr-osmosdr
+GR_OSMOSDR_SITE = https://gitea.osmocom.org/sdr/gr-osmosdr
 GR_OSMOSDR_LICENSE = GPL-3.0+
 GR_OSMOSDR_LICENSE_FILES = COPYING
 GR_OSMOSDR_SITE_METHOD = git
