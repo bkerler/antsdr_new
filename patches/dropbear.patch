@@ -1,0 +1,12 @@
+--- a/package/dropbear/dropbear.mk	2022-08-06 17:08:10.843848494 +0200
++++ b/package/dropbear/dropbear.mk	2022-08-06 17:35:08.463192598 +0200
+@@ -5,7 +5,8 @@
+ ################################################################################
+ 
+ DROPBEAR_VERSION = 2020.81
+-DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
++#DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
++DROPBEAR_SITE = https://mirror.dropbear.nl/mirror
+ DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
+ DROPBEAR_LICENSE = MIT, BSD-2-Clause, Public domain
+ DROPBEAR_LICENSE_FILES = LICENSE
