@@ -53,6 +53,11 @@ If you like to add other stuff like gnuradio and some sdr goodies, then run also
 ./patch_additional.sh
 ```
 
+If there is an error about a missing asm/error.h on compiling LuaJit, do the following:
+```bash
+sudo ln -s /usr/include/asm-generic /usr/include/asm
+```
+
 To use Vitis 2022.1 as external custom toolchain the following steps have to be done:
 
 1. apply a patch to Vitis 2022.1

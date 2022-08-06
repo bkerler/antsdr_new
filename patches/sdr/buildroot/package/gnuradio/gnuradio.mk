@@ -24,6 +24,7 @@ GNURADIO_DEPENDENCIES = \
 	host-python-mako \
 	host-python-six \
 	boost \
+	libsndfile \
     spdlog \
 	log4cpp \
 	gmp \
