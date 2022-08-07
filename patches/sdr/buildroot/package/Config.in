@@ -2629,8 +2629,10 @@ endmenu
 
 menu "SDR"
    source "package/ad9361/Config.in"
+   source "package/rtaudio/Config.in"
    source "package/soapysdr/Config.in"
    source "package/SoapyRemote/Config.in"
+   source "package/SoapyPlutoSDR/Config.in"
    source "package/retrogram-plutosdr/Config.in"
    source "package/gnuradio/Config.in"
    source "package/volk/Config.in"
@@ -2657,6 +2659,7 @@ menu "SDR"
    source "package/csdr/Config.in"
    source "package/civetwebws/Config.in"
    source "package/charon/Config.in"
+   source "package/sdrpp/Config.in"
 endmenu
 
 endmenu

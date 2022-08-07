@@ -1,0 +1,21 @@
+################################################################################
+#
+# SOAPYPLUTOSDR
+#
+################################################################################
+
+SOAPYPLUTOSDR_VERSION = a07c37230369653818b3a5c448c00cee1ac9f8e5
+#SOAPYPLUTOSDR_SOURCE = SOAPYPLUTOSDR.git
+SOAPYPLUTOSDR_SITE = https://github.com/pothosware/SoapyPlutoSDR
+SOAPYPLUTOSDR_SITE_METHOD = git
+SOAPYPLUTOSDR_INSTALL_STAGING = YES
+SOAPYPLUTOSDR_INSTALL_TARGET = YES
+SOAPYPLUTOSDR_LICENSE = Boost Software License 1.0
+SOAPYPLUTOSDR_LICENSE_FILES = LICENSE
+SOAPYPLUTOSDR_DEPENDENCIES += soapysdr
+SOAPYPLUTOSDR_TARGET: $(SOAPYPLUTOSDR_DEPENDENCIES)
+
+#SOAPYPLUTOSDR_CONF_OPTS = -DBUILD_DEMOS=ON
+#SOAPYPLUTOSDR_DEPENDENCIES = libglib2 host-pkgconf
+
+$(eval $(cmake-package))

@@ -1,0 +1,6 @@
+config BR2_PACKAGE_SDRPP
+        bool "sdrpp"
+        help
+          This is a comment that explains what sdrpp is.
+
+          https://github.com/AlexandreRouma/SDRPlusPlus
